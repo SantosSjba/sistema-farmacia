@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SummaryDocuments xmlns="urn:sunat:names:specification:ubl:peru:schema:xsd:SummaryDocuments-1" xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2" xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:ext="urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2" xmlns:sac="urn:sunat:names:specification:ubl:peru:schema:xsd:SunatAggregateComponents-1" xmlns:qdt="urn:oasis:names:specification:ubl:schema:xsd:QualifiedDatatypes-2" xmlns:udt="urn:un:unece:uncefact:data:specification:UnqualifiedDataTypesSchemaModule:2">
+     <ext:UBLExtensions>
+         <ext:UBLExtension>
+             <ext:ExtensionContent/>
+         </ext:UBLExtension>
+     </ext:UBLExtensions>
+     <cbc:UBLVersionID>2.0</cbc:UBLVersionID>
+     <cbc:CustomizationID>1.1</cbc:CustomizationID>
+     <cbc:ID>6--</cbc:ID>
+     <cbc:ReferenceDate/>
+     <cbc:IssueDate/>
+     <cac:Signature>
+         <cbc:ID>6--</cbc:ID>
+         <cac:SignatoryParty>
+             <cac:PartyIdentification>
+                 <cbc:ID>.</cbc:ID>
+             </cac:PartyIdentification>
+             <cac:PartyName>
+                 <cbc:Name><![CDATA[.]]></cbc:Name>
+             </cac:PartyName>
+         </cac:SignatoryParty>
+         <cac:DigitalSignatureAttachment>
+             <cac:ExternalReference>
+                 <cbc:URI>6--</cbc:URI>
+             </cac:ExternalReference>
+         </cac:DigitalSignatureAttachment>
+     </cac:Signature>
+     <cac:AccountingSupplierParty>
+         <cbc:CustomerAssignedAccountID>.</cbc:CustomerAssignedAccountID>
+         <cbc:AdditionalAccountID>.</cbc:AdditionalAccountID>
+         <cac:Party>
+             <cac:PartyLegalEntity>
+                 <cbc:RegistrationName><![CDATA[.]]></cbc:RegistrationName>
+             </cac:PartyLegalEntity>
+         </cac:Party>
+     </cac:AccountingSupplierParty><sac:SummaryDocumentsLine>
+            <cbc:LineID>R</cbc:LineID>
+            <cbc:DocumentTypeCode>R</cbc:DocumentTypeCode>
+            <cbc:ID>R-R</cbc:ID>
+            <cac:Status>
+               <cbc:ConditionCode>3</cbc:ConditionCode>
+            </cac:Status>
+            <sac:TotalAmount currencyID="PEN">R</sac:TotalAmount><sac:BillingPayment>
+               <cbc:PaidAmount currencyID="PEN">R</cbc:PaidAmount>
+               <cbc:InstructionID>R</cbc:InstructionID>
+            </sac:BillingPayment><cac:TaxTotal>
+            <cbc:TaxAmount currencyID="PEN">R</cbc:TaxAmount><cac:TaxSubtotal>
+                      <cbc:TaxAmount currencyID="PEN">R</cbc:TaxAmount>
+                      <cac:TaxCategory>
+                          <cac:TaxScheme>
+                              <cbc:ID>R</cbc:ID>
+                              <cbc:Name>R</cbc:Name>
+                              <cbc:TaxTypeCode>R</cbc:TaxTypeCode>
+                          </cac:TaxScheme>
+                      </cac:TaxCategory>
+                  </cac:TaxSubtotal><cac:TaxSubtotal>
+                      <cbc:TaxAmount currencyID="PEN">R</cbc:TaxAmount>
+                      <cac:TaxCategory>
+                          <cac:TaxScheme>
+                              <cbc:ID>1000</cbc:ID>
+                              <cbc:Name>IGV</cbc:Name>
+                              <cbc:TaxTypeCode>VAT</cbc:TaxTypeCode>
+                          </cac:TaxScheme>
+                      </cac:TaxCategory>
+                  </cac:TaxSubtotal></cac:TaxTotal>
+        </sac:SummaryDocumentsLine><sac:SummaryDocumentsLine>
+            <cbc:LineID>2</cbc:LineID>
+            <cbc:DocumentTypeCode>2</cbc:DocumentTypeCode>
+            <cbc:ID>2-2</cbc:ID>
+            <cac:Status>
+               <cbc:ConditionCode>3</cbc:ConditionCode>
+            </cac:Status>
+            <sac:TotalAmount currencyID="PEN">2</sac:TotalAmount><sac:BillingPayment>
+               <cbc:PaidAmount currencyID="PEN">2</cbc:PaidAmount>
+               <cbc:InstructionID>2</cbc:InstructionID>
+            </sac:BillingPayment><cac:TaxTotal>
+            <cbc:TaxAmount currencyID="PEN">2</cbc:TaxAmount><cac:TaxSubtotal>
+                      <cbc:TaxAmount currencyID="PEN">2</cbc:TaxAmount>
+                      <cac:TaxCategory>
+                          <cac:TaxScheme>
+                              <cbc:ID>2</cbc:ID>
+                              <cbc:Name>2</cbc:Name>
+                              <cbc:TaxTypeCode>2</cbc:TaxTypeCode>
+                          </cac:TaxScheme>
+                      </cac:TaxCategory>
+                  </cac:TaxSubtotal><cac:TaxSubtotal>
+                      <cbc:TaxAmount currencyID="PEN">2</cbc:TaxAmount>
+                      <cac:TaxCategory>
+                          <cac:TaxScheme>
+                              <cbc:ID>1000</cbc:ID>
+                              <cbc:Name>IGV</cbc:Name>
+                              <cbc:TaxTypeCode>VAT</cbc:TaxTypeCode>
+                          </cac:TaxScheme>
+                      </cac:TaxCategory>
+                  </cac:TaxSubtotal></cac:TaxTotal>
+        </sac:SummaryDocumentsLine><sac:SummaryDocumentsLine>
+            <cbc:LineID>1</cbc:LineID>
+            <cbc:DocumentTypeCode>1</cbc:DocumentTypeCode>
+            <cbc:ID>1-1</cbc:ID>
+            <cac:Status>
+               <cbc:ConditionCode>3</cbc:ConditionCode>
+            </cac:Status>
+            <sac:TotalAmount currencyID="PEN">1</sac:TotalAmount><sac:BillingPayment>
+               <cbc:PaidAmount currencyID="PEN">1</cbc:PaidAmount>
+               <cbc:InstructionID>1</cbc:InstructionID>
+            </sac:BillingPayment><cac:TaxTotal>
+            <cbc:TaxAmount currencyID="PEN">1</cbc:TaxAmount><cac:TaxSubtotal>
+                      <cbc:TaxAmount currencyID="PEN">1</cbc:TaxAmount>
+                      <cac:TaxCategory>
+                          <cac:TaxScheme>
+                              <cbc:ID>1</cbc:ID>
+                              <cbc:Name>1</cbc:Name>
+                              <cbc:TaxTypeCode>1</cbc:TaxTypeCode>
+                          </cac:TaxScheme>
+                      </cac:TaxCategory>
+                  </cac:TaxSubtotal><cac:TaxSubtotal>
+                      <cbc:TaxAmount currencyID="PEN">1</cbc:TaxAmount>
+                      <cac:TaxCategory>
+                          <cac:TaxScheme>
+                              <cbc:ID>1000</cbc:ID>
+                              <cbc:Name>IGV</cbc:Name>
+                              <cbc:TaxTypeCode>VAT</cbc:TaxTypeCode>
+                          </cac:TaxScheme>
+                      </cac:TaxCategory>
+                  </cac:TaxSubtotal></cac:TaxTotal>
+        </sac:SummaryDocumentsLine><sac:SummaryDocumentsLine>
+            <cbc:LineID>2</cbc:LineID>
+            <cbc:DocumentTypeCode>2</cbc:DocumentTypeCode>
+            <cbc:ID>2-2</cbc:ID>
+            <cac:Status>
+               <cbc:ConditionCode>3</cbc:ConditionCode>
+            </cac:Status>
+            <sac:TotalAmount currencyID="PEN">2</sac:TotalAmount><sac:BillingPayment>
+               <cbc:PaidAmount currencyID="PEN">2</cbc:PaidAmount>
+               <cbc:InstructionID>2</cbc:InstructionID>
+            </sac:BillingPayment><cac:TaxTotal>
+            <cbc:TaxAmount currencyID="PEN">2</cbc:TaxAmount><cac:TaxSubtotal>
+                      <cbc:TaxAmount currencyID="PEN">2</cbc:TaxAmount>
+                      <cac:TaxCategory>
+                          <cac:TaxScheme>
+                              <cbc:ID>2</cbc:ID>
+                              <cbc:Name>2</cbc:Name>
+                              <cbc:TaxTypeCode>2</cbc:TaxTypeCode>
+                          </cac:TaxScheme>
+                      </cac:TaxCategory>
+                  </cac:TaxSubtotal><cac:TaxSubtotal>
+                      <cbc:TaxAmount currencyID="PEN">2</cbc:TaxAmount>
+                      <cac:TaxCategory>
+                          <cac:TaxScheme>
+                              <cbc:ID>1000</cbc:ID>
+                              <cbc:Name>IGV</cbc:Name>
+                              <cbc:TaxTypeCode>VAT</cbc:TaxTypeCode>
+                          </cac:TaxScheme>
+                      </cac:TaxCategory>
+                  </cac:TaxSubtotal></cac:TaxTotal>
+        </sac:SummaryDocumentsLine><sac:SummaryDocumentsLine>
+            <cbc:LineID>2</cbc:LineID>
+            <cbc:DocumentTypeCode>2</cbc:DocumentTypeCode>
+            <cbc:ID>2-2</cbc:ID>
+            <cac:Status>
+               <cbc:ConditionCode>3</cbc:ConditionCode>
+            </cac:Status>
+            <sac:TotalAmount currencyID="PEN">2</sac:TotalAmount><sac:BillingPayment>
+               <cbc:PaidAmount currencyID="PEN">2</cbc:PaidAmount>
+               <cbc:InstructionID>2</cbc:InstructionID>
+            </sac:BillingPayment><cac:TaxTotal>
+            <cbc:TaxAmount currencyID="PEN">2</cbc:TaxAmount><cac:TaxSubtotal>
+                      <cbc:TaxAmount currencyID="PEN">2</cbc:TaxAmount>
+                      <cac:TaxCategory>
+                          <cac:TaxScheme>
+                              <cbc:ID>2</cbc:ID>
+                              <cbc:Name>2</cbc:Name>
+                              <cbc:TaxTypeCode>2</cbc:TaxTypeCode>
+                          </cac:TaxScheme>
+                      </cac:TaxCategory>
+                  </cac:TaxSubtotal><cac:TaxSubtotal>
+                      <cbc:TaxAmount currencyID="PEN">2</cbc:TaxAmount>
+                      <cac:TaxCategory>
+                          <cac:TaxScheme>
+                              <cbc:ID>1000</cbc:ID>
+                              <cbc:Name>IGV</cbc:Name>
+                              <cbc:TaxTypeCode>VAT</cbc:TaxTypeCode>
+                          </cac:TaxScheme>
+                      </cac:TaxCategory>
+                  </cac:TaxSubtotal></cac:TaxTotal>
+        </sac:SummaryDocumentsLine></SummaryDocuments>
