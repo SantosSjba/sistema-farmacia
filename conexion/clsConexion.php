@@ -6,10 +6,10 @@ class clsConexion
 	{
 		try {
 			//modificar los datos de la conexion
-			$host = "localhost";
-			$db_name = "clinaxkk_farmacia";
-			$user = "clinaxkk_farmacia";
-			$pass = "q63KCE2}$~(&";
+			$host = "195.250.27.211";
+			$db_name = "factosys_boticajl";
+			$user = "factosys_boticajl";
+			$pass = "boticajl2025"; // TODO: Ingrese aquí la contraseña del usuario factosys de su cPanel
 			//cadena de conexion
 			$this->con = mysqli_connect($host, $user, $pass) or die("erro en la conexion a la bd");
 			mysqli_select_db($this->con, $db_name) or die("no se encontro la bd");
