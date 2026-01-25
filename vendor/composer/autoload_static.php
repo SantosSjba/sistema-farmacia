@@ -71,8 +71,8 @@ class ComposerStaticInitaa0ee1b690fc5089c32ccde65eee8779
         ),
         'Psr\\Http\\Message\\' => 
         array (
-            0 => __DIR__ . '/..' . '/psr/http-message/src',
-            1 => __DIR__ . '/..' . '/psr/http-factory/src',
+            0 => __DIR__ . '/..' . '/psr/http-factory/src',
+            1 => __DIR__ . '/..' . '/psr/http-message/src',
         ),
         'Psr\\Http\\Client\\' => 
         array (
@@ -104,10 +104,10 @@ class ComposerStaticInitaa0ee1b690fc5089c32ccde65eee8779
         ),
         'Greenter\\' => 
         array (
-            0 => __DIR__ . '/..' . '/greenter/xml/src',
-            1 => __DIR__ . '/..' . '/greenter/core/src/Core',
+            0 => __DIR__ . '/..' . '/greenter/lite/src/Greenter',
+            1 => __DIR__ . '/..' . '/greenter/xml/src',
             2 => __DIR__ . '/..' . '/greenter/ws/src',
-            3 => __DIR__ . '/..' . '/greenter/lite/src/Greenter',
+            3 => __DIR__ . '/..' . '/greenter/core/src/Core',
         ),
     );
 
