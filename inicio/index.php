@@ -17,6 +17,48 @@ $usur=$obj->consultar("SELECT razon_social FROM configuracion");
               foreach($usur as $row){
               $direccion=$row['razon_social'];
               }
+
+// Calcular métricas financieras del día
+$ventas = 0;
+$costos = 0;
+$ganancia = 0;
+$gastos = 0;
+$neto = 0;
+
+// Obtener ID de usuario
+$usur_id = $obj->consultar("SELECT idusu FROM usuario WHERE usuario='$usu'");
+$idusuario = 0;
+foreach((array)$usur_id as $row){
+    $idusuario = $row['idusu'];
+}
+
+// Calcular ventas del día
+if($idusuario > 0) {
+    $result_ventas = $obj->consultar("SELECT COALESCE(SUM(total), 0) as total_ventas FROM venta WHERE fecha_emision='$dia' AND idusuario='$idusuario'");
+    foreach((array)$result_ventas as $row){
+        $ventas = $row['total_ventas'] ? $row['total_ventas'] : 0;
+    }
+
+    // Calcular costos del día (precio_compra * cantidad de productos vendidos)
+    $result_costos = $obj->consultar("SELECT COALESCE(SUM(productos.precio_compra * detalleventa.cantidad), 0) as total_costos 
+                                       FROM detalleventa 
+                                       INNER JOIN productos ON detalleventa.idproducto = productos.idproducto 
+                                       INNER JOIN venta ON detalleventa.idventa = venta.idventa 
+                                       WHERE venta.fecha_emision='$dia' AND venta.idusuario='$idusuario'");
+    foreach((array)$result_costos as $row){
+        $costos = $row['total_costos'] ? $row['total_costos'] : 0;
+    }
+}
+
+// Calcular ganancia
+$ganancia = $ventas - $costos;
+
+// Gastos (por ahora 0, se puede agregar tabla de gastos después)
+$gastos = 0;
+
+// Calcular neto
+$neto = $ganancia - $gastos;
+
 // productos por vender
               $resultf=$obj->consultar("SELECT productos.*,lote.fecha_vencimiento FROM productos INNER JOIN lote
               ON productos.idlote = lote.idlote where date_sub(fecha_vencimiento, interval 14 day) <= curdate()");
@@ -37,8 +79,8 @@ $usur=$obj->consultar("SELECT razon_social FROM configuracion");
 			<h1><?php $dias = array("Domingo","Lunes","Martes","Miercoles","Jueves","Viernes","Sábado");
 $meses = array("Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre");
 echo $dias[date('w')]." ".date('d')." de ".$meses[date('n')-1]. " del ".date('Y');?></h1>
-			<h3>Bienvenido:::....<strong><?php echo "$usu";?></strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        Razon Social:::::.....<strong><?php echo "$direccion";?></strong></h3>
+			<h3>Bienvenido <strong><?php echo "$usu";?></strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        Razon Social: <strong><?php echo "$direccion";?></strong></h3>
 		</div>
 	</div>
 </div>
@@ -82,6 +124,51 @@ echo $dias[date('w')]." ".date('d')." de ".$meses[date('n')-1]. " del ".date('Y'
     </div>
 </div>
   </div>
+
+<!-- Sección de métricas financieras -->
+<div class="row">
+	<div class="col-sm-12">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<div class="panel-title">Resumen Financiero del Día</div>
+			</div>
+			<div class="panel-body">
+				<div class="row">
+					<div class="col-xs-12 col-sm-6 col-md-2 col-lg-2" style="margin-bottom: 10px; padding: 0 5px;">
+						<div style="text-align: center; padding: 20px; background-color: #f5f5f5; border-radius: 5px; min-height: 100px;">
+							<div style="font-size: 14px; color: #666; margin-bottom: 8px; font-weight: 500;">Ventas</div>
+							<div style="font-size: 28px; font-weight: bold; color: #333;"><?php echo number_format($ventas, 2); ?></div>
+						</div>
+					</div>
+					<div class="col-xs-12 col-sm-6 col-md-2 col-lg-2" style="margin-bottom: 10px; padding: 0 5px;">
+						<div style="text-align: center; padding: 20px; background-color: #f5f5f5; border-radius: 5px; min-height: 100px;">
+							<div style="font-size: 14px; color: #666; margin-bottom: 8px; font-weight: 500;">Costo</div>
+							<div style="font-size: 28px; font-weight: bold; color: #333;"><?php echo number_format($costos, 2); ?></div>
+						</div>
+					</div>
+					<div class="col-xs-12 col-sm-6 col-md-2 col-lg-2" style="margin-bottom: 10px; padding: 0 5px;">
+						<div style="text-align: center; padding: 20px; background-color: #f5f5f5; border-radius: 5px; min-height: 100px;">
+							<div style="font-size: 14px; color: #666; margin-bottom: 8px; font-weight: 500;">Ganancia</div>
+							<div style="font-size: 28px; font-weight: bold; color: #28a745;"><?php echo number_format($ganancia, 2); ?></div>
+						</div>
+					</div>
+					<div class="col-xs-12 col-sm-6 col-md-2 col-lg-2" style="margin-bottom: 10px; padding: 0 5px;">
+						<div style="text-align: center; padding: 20px; background-color: #f5f5f5; border-radius: 5px; min-height: 100px;">
+							<div style="font-size: 14px; color: #666; margin-bottom: 8px; font-weight: 500;">Gastos</div>
+							<div style="font-size: 28px; font-weight: bold; color: #dc3545;"><?php echo number_format($gastos, 2); ?></div>
+						</div>
+					</div>
+					<div class="col-xs-12 col-sm-6 col-md-2 col-lg-2" style="margin-bottom: 10px; padding: 0 5px;">
+						<div style="text-align: center; padding: 20px; background-color: #e8f5e9; border-radius: 5px; border: 2px solid #4caf50; min-height: 100px;">
+							<div style="font-size: 14px; color: #666; margin-bottom: 8px; font-weight: 500;">Neto</div>
+							<div style="font-size: 28px; font-weight: bold; color: #2e7d32;"><?php echo number_format($neto, 2); ?></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
 
 <div class="row">
 	<div class="col-sm-12">
