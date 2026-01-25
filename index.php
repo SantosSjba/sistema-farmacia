@@ -436,35 +436,61 @@ foreach ((array) $data as $row) {
             }
         }
 
-        /* Efecto de carga al enviar formulario */
+        /* Efecto de carga al enviar formulario - Un solo loader suave */
         .form-loading {
             pointer-events: none;
-            opacity: 0.7;
         }
 
         .form-loading .btn {
             position: relative;
+            overflow: hidden;
         }
 
+        /* Ocultar texto suavemente cuando está cargando */
+        .form-loading .btn span,
+        .form-loading .btn i {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        /* Spinner CSS único - animación suave */
         .form-loading .btn::after {
             content: '';
             position: absolute;
-            width: 20px;
-            height: 20px;
+            width: 18px;
+            height: 18px;
             top: 50%;
             left: 50%;
-            margin-left: -10px;
-            margin-top: -10px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-top-color: white;
+            margin-left: -9px;
+            margin-top: -9px;
+            border: 2.5px solid rgba(255, 255, 255, 0.25);
+            border-top-color: rgba(255, 255, 255, 0.95);
+            border-right-color: rgba(255, 255, 255, 0.5);
             border-radius: 50%;
-            animation: spin 0.8s linear infinite;
+            animation: spinLoader 0.75s linear infinite;
+            z-index: 10;
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
 
-        @keyframes spin {
-            to {
+        /* Mostrar spinner cuando está cargando */
+        .form-loading .btn::after {
+            opacity: 1;
+        }
+
+        /* Animación suave del spinner */
+        @keyframes spinLoader {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
                 transform: rotate(360deg);
             }
+        }
+
+        /* Asegurar que el botón mantenga su altura durante la carga */
+        .form-loading .btn {
+            min-height: 48px;
         }
     </style>
 
@@ -539,12 +565,23 @@ foreach ((array) $data as $row) {
             'border': 'none'
         });
 
-        // Animación al enviar el formulario
-        $('#loginForm').on('submit', function() {
-            $(this).addClass('form-loading');
+        // Prevenir doble envío y mostrar loader único con animación suave
+        let formSubmitted = false;
+        $('#loginForm').on('submit', function(e) {
+            if (formSubmitted) {
+                e.preventDefault();
+                return false;
+            }
+            formSubmitted = true;
+            
             var $btn = $('#loginButton');
-            $btn.find('span').html('<i class="fa fa-spinner fa-spin"></i> Iniciando sesión...');
-            $btn.prop('disabled', true);
+            var $form = $(this);
+            
+            // Agregar clase de loading con pequeña demora para transición suave
+            setTimeout(function() {
+                $form.addClass('form-loading');
+                $btn.prop('disabled', true);
+            }, 50);
         });
 
         // Efecto de focus mejorado en los inputs
@@ -563,16 +600,6 @@ foreach ((array) $data as $row) {
             } else {
                 $(this).css('border-color', '#e0e0e0');
             }
-        });
-
-        // Prevenir doble envío
-        let formSubmitted = false;
-        $('#loginForm').on('submit', function(e) {
-            if (formSubmitted) {
-                e.preventDefault();
-                return false;
-            }
-            formSubmitted = true;
         });
 
         // Verificar que las imágenes carguen correctamente
