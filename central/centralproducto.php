@@ -17,10 +17,22 @@ foreach ((array)$result as $row) {
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<meta name="description" content="sistemasinfor.com" />
+	<meta name="description" content="Botica J&L - Sistema de Farmacia" />
 	<meta name="author" content="" />
-	<title>SISFARMA</title>
-	<link rel="shortcut icon" href="../assets/images/favicon.png" />
+	<title>Botica J&L</title>
+	<link rel="shortcut icon" href="../assets/images/logojl.png" />
+	<!-- Tailwind CSS CDN -->
+	<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+	<style type="text/tailwindcss">
+		@theme {
+			--color-jl-pink: #E91E8C;
+			--color-jl-pink-dark: #C4177A;
+			--color-jl-pink-light: #F54BA8;
+			--color-jl-teal: #2EB8A6;
+			--color-jl-teal-dark: #1F9A8A;
+			--color-jl-teal-light: #4FCBB9;
+		}
+	</style>
 	<link rel="stylesheet" href="../assets/js/jquery-ui/css/no-theme/jquery-ui-1.10.3.custom.min.css">
 	<link rel="stylesheet" href="../assets/css/font-icons/entypo/css/entypo.css">
 	<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Noto+Sans:400,700,400italic">
@@ -40,7 +52,7 @@ foreach ((array)$result as $row) {
 		<div class="sidebar-menu">
 			<header class="logo-env">
 				<!-- logo -->
-				<div class="logo"><a href="#"><img src="../assets/images/logo.png" width="120" alt="" /></a></div>
+				<div class="logo"><a href="#"><img src="../assets/images/logojl.png" width="120" alt="Botica J&L" /></a></div>
 				<div class="sidebar-collapse"><a href="#"
 						class="sidebar-collapse-icon with-animation"><!-- add class "with-animation" if you want sidebar to have animation during expanding/collapsing transition -->
 						<i class="entypo-menu"></i></a></div>
