@@ -21,10 +21,9 @@ foreach ((array)$result as $row) {
 	<meta name="author" content="" />
 	<title>Botica J&L</title>
 	<link rel="shortcut icon" href="../assets/images/logojl.png" />
-	<!-- Tailwind CSS CDN -->
-	<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-	<style type="text/tailwindcss">
-		@theme {
+	<style>
+		/* Variables de colores del tema */
+		:root {
 			--color-jl-pink: #E91E8C;
 			--color-jl-pink-dark: #C4177A;
 			--color-jl-pink-light: #F54BA8;
