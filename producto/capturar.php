@@ -8,28 +8,28 @@
 <?php
 include_once("../conexion/clsConexion.php");
 $obj= new clsConexion();
-$funcion=$_POST["funcion"];
+$funcion = isset($_POST["funcion"]) ? $_POST["funcion"] : '';
+
 if($funcion=="modificar"){
-  $cod=trim($obj->real_escape_string($_POST['cod'],ENT_QUOTES));
-  $cb=trim($obj->real_escape_string($_POST['txtcb'],ENT_QUOTES));
-  $lo=trim($obj->real_escape_string($_POST['txtlo'],ENT_QUOTES));
-  $de=trim($obj->real_escape_string($_POST['txtde'],ENT_QUOTES));
-  $ti=trim($obj->real_escape_string($_POST['txtti'],ENT_QUOTES));
-  $st=trim($obj->real_escape_string($_POST['txtst'],ENT_QUOTES));
-  $stm=trim($obj->real_escape_string($_POST['txtstm'],ENT_QUOTES));
-  $pc=trim($obj->real_escape_string($_POST['txtpc'],ENT_QUOTES));
-  $pv=trim($obj->real_escape_string($_POST['txtpv'],ENT_QUOTES));
-  // $des=trim($obj->real_escape_string($_POST['txtdes'],ENT_QUOTES));
-  $vs=trim($obj->real_escape_string($_POST['txtvs'],ENT_QUOTES));
-  $fec=trim($obj->real_escape_string($_POST['txtfec'],ENT_QUOTES));
-  $rs=trim($obj->real_escape_string($_POST['txtrs'],ENT_QUOTES));
-  $cat=trim($obj->real_escape_string($_POST['tcat'],ENT_QUOTES));
-  $pre=trim($obj->real_escape_string($_POST['tpre'],ENT_QUOTES));
-  $tidcli=trim($obj->real_escape_string($_POST['tidcli'],ENT_QUOTES));
-  $si=trim($obj->real_escape_string($_POST['tsi'],ENT_QUOTES));
-  $estado=trim($obj->real_escape_string($_POST['txte'],ENT_QUOTES));
-  $tafec=trim($obj->real_escape_string($_POST['tafec'],ENT_QUOTES));
-  $tipo_pre=trim($obj->real_escape_string($_POST['tipo_pre'],ENT_QUOTES));
+  $cod = intval(isset($_POST['cod']) ? $_POST['cod'] : 0);
+  $cb = $obj->real_escape_string(trim(isset($_POST['txtcb']) ? $_POST['txtcb'] : ''));
+  $lo = intval(isset($_POST['txtlo']) ? $_POST['txtlo'] : 1);
+  $de = $obj->real_escape_string(trim(isset($_POST['txtde']) ? $_POST['txtde'] : ''));
+  $ti = $obj->real_escape_string(trim(isset($_POST['txtti']) ? $_POST['txtti'] : 'Generico'));
+  $st = intval(isset($_POST['txtst']) ? $_POST['txtst'] : 0);
+  $stm = intval(isset($_POST['txtstm']) ? $_POST['txtstm'] : 0);
+  $pc = floatval(isset($_POST['txtpc']) ? $_POST['txtpc'] : 0);
+  $pv = floatval(isset($_POST['txtpv']) ? $_POST['txtpv'] : 0);
+  $vs = $obj->real_escape_string(trim(isset($_POST['txtvs']) ? $_POST['txtvs'] : 'sin receta medica'));
+  $fec = $obj->real_escape_string(trim(isset($_POST['txtfec']) ? $_POST['txtfec'] : date('Y-m-d')));
+  $rs = $obj->real_escape_string(trim(isset($_POST['txtrs']) ? $_POST['txtrs'] : ''));
+  $cat = intval(isset($_POST['tcat']) ? $_POST['tcat'] : 0);
+  $pre = intval(isset($_POST['tpre']) ? $_POST['tpre'] : 1);
+  $tidcli = intval(isset($_POST['tidcli']) ? $_POST['tidcli'] : 0);
+  $si = intval(isset($_POST['tsi']) ? $_POST['tsi'] : 0);
+  $estado = $obj->real_escape_string(trim(isset($_POST['txte']) ? $_POST['txte'] : '1'));
+  $tafec = intval(isset($_POST['tafec']) ? $_POST['tafec'] : 1);
+  $tipo_pre = $obj->real_escape_string(trim(isset($_POST['tipo_pre']) ? $_POST['tipo_pre'] : '01'));
 
   // Valores por defecto para productos generales (cuando no se selecciona o está vacío)
   if(empty($ti) || $ti == 'No Aplica') $ti = 'No Aplica';
@@ -78,25 +78,24 @@ if($res){
 	}
 
 if($funcion=="registrar"){
-  $cb=trim($obj->real_escape_string($_POST['txtcb'],ENT_QUOTES));
-  $lo=trim($obj->real_escape_string($_POST['txtlo'],ENT_QUOTES));
-  $de=trim($obj->real_escape_string($_POST['txtde'],ENT_QUOTES));
-  $ti=trim($obj->real_escape_string($_POST['txtti'],ENT_QUOTES));
-  $st=trim($obj->real_escape_string($_POST['txtst'],ENT_QUOTES));
-  $stm=trim($obj->real_escape_string($_POST['txtstm'],ENT_QUOTES));
-  $pc=trim($obj->real_escape_string($_POST['txtpc'],ENT_QUOTES));
-  $pv=trim($obj->real_escape_string($_POST['txtpv'],ENT_QUOTES));
-  // $des=trim($obj->real_escape_string($_POST['txtdes'],ENT_QUOTES));
-  $vs=trim($obj->real_escape_string($_POST['txtvs'],ENT_QUOTES));
-  $fec=trim($obj->real_escape_string($_POST['txtfec'],ENT_QUOTES));
-  $rs=trim($obj->real_escape_string($_POST['txtrs'],ENT_QUOTES));
-  $cat=trim($obj->real_escape_string($_POST['tcat'],ENT_QUOTES));
-  $pre=trim($obj->real_escape_string($_POST['tpre'],ENT_QUOTES));
-  $tidcli=trim($obj->real_escape_string($_POST['tidcli'],ENT_QUOTES));
-  $si=trim($obj->real_escape_string($_POST['tsi'],ENT_QUOTES));
-  $estado=trim($obj->real_escape_string($_POST['txte'],ENT_QUOTES));
-  $tafec=trim($obj->real_escape_string($_POST['tafec'],ENT_QUOTES));
-  $tipo_pre=trim($obj->real_escape_string($_POST['tipo_pre'],ENT_QUOTES));
+  $cb = $obj->real_escape_string(trim(isset($_POST['txtcb']) ? $_POST['txtcb'] : ''));
+  $lo = intval(isset($_POST['txtlo']) ? $_POST['txtlo'] : 0);
+  $de = $obj->real_escape_string(trim(isset($_POST['txtde']) ? $_POST['txtde'] : ''));
+  $ti = $obj->real_escape_string(trim(isset($_POST['txtti']) ? $_POST['txtti'] : 'Generico'));
+  $st = intval(isset($_POST['txtst']) ? $_POST['txtst'] : 0);
+  $stm = intval(isset($_POST['txtstm']) ? $_POST['txtstm'] : 0);
+  $pc = floatval(isset($_POST['txtpc']) ? $_POST['txtpc'] : 0);
+  $pv = floatval(isset($_POST['txtpv']) ? $_POST['txtpv'] : 0);
+  $vs = $obj->real_escape_string(trim(isset($_POST['txtvs']) ? $_POST['txtvs'] : 'sin receta medica'));
+  $fec = $obj->real_escape_string(trim(isset($_POST['txtfec']) ? $_POST['txtfec'] : date('Y-m-d')));
+  $rs = $obj->real_escape_string(trim(isset($_POST['txtrs']) ? $_POST['txtrs'] : ''));
+  $cat = intval(isset($_POST['tcat']) ? $_POST['tcat'] : 0);
+  $pre = intval(isset($_POST['tpre']) ? $_POST['tpre'] : 1);
+  $tidcli = intval(isset($_POST['tidcli']) ? $_POST['tidcli'] : 0);
+  $si = intval(isset($_POST['tsi']) ? $_POST['tsi'] : 0);
+  $estado = $obj->real_escape_string(trim(isset($_POST['txte']) ? $_POST['txte'] : '1'));
+  $tafec = intval(isset($_POST['tafec']) ? $_POST['tafec'] : 1);
+  $tipo_pre = $obj->real_escape_string(trim(isset($_POST['tipo_pre']) ? $_POST['tipo_pre'] : '01'));
   
   // Valores por defecto para productos generales (cuando no se selecciona o está vacío)
   if(empty($ti) || $ti == 'No Aplica') $ti = 'No Aplica';
@@ -122,21 +121,34 @@ if($funcion=="registrar"){
   
   // Si laboratorio está vacío, buscar "SIN LABORATORIO" o el primero disponible
   if(empty($tidcli)) {
-    $result_lab = $obj->consultar("SELECT idcliente FROM cliente WHERE tipo='laboratorio' AND (nombres LIKE '%SIN LABORATORIO%' OR nombres LIKE '%GENERICO%') LIMIT 1");
+    // Buscar laboratorio con diferentes criterios (insensible a mayúsculas)
+    $result_lab = $obj->consultar("SELECT idcliente FROM cliente WHERE LOWER(TRIM(tipo))='laboratorio' AND (LOWER(nombres) LIKE '%sin laboratorio%' OR LOWER(nombres) LIKE '%generico%') LIMIT 1");
     if(empty($result_lab)) {
-      $result_lab = $obj->consultar("SELECT idcliente FROM cliente WHERE tipo='laboratorio' LIMIT 1");
+      $result_lab = $obj->consultar("SELECT idcliente FROM cliente WHERE LOWER(TRIM(tipo))='laboratorio' LIMIT 1");
     }
-    foreach((array)$result_lab as $row) { $tidcli = $row['idcliente']; }
+    // Si aún no hay laboratorios, buscar cualquier cliente
+    if(empty($result_lab)) {
+      $result_lab = $obj->consultar("SELECT idcliente FROM cliente LIMIT 1");
+    }
+    foreach((array)$result_lab as $row) { $tidcli = intval($row['idcliente']); }
   }
   
   // Si lote está vacío, buscar "SIN LOTE" o el primero disponible
   if(empty($lo)) {
-    $result_lote = $obj->consultar("SELECT idlote FROM lote WHERE numero LIKE '%SIN LOTE%' LIMIT 1");
+    $result_lote = $obj->consultar("SELECT idlote FROM lote WHERE numero LIKE '%SIN LOTE%' OR numero = '0000' LIMIT 1");
     if(empty($result_lote)) {
       $result_lote = $obj->consultar("SELECT idlote FROM lote LIMIT 1");
     }
-    foreach((array)$result_lote as $row) { $lo = $row['idlote']; }
+    foreach((array)$result_lote as $row) { $lo = intval($row['idlote']); }
   }
+  
+  // Validar que todos los campos requeridos tengan valores
+  if(empty($cat)) $cat = 1;
+  if(empty($si)) $si = 1;
+  if(empty($tidcli)) $tidcli = 1;
+  if(empty($lo)) $lo = 1;
+  if(empty($pre)) $pre = 1;
+  if(empty($tafec)) $tafec = 1;
 
 $sql="INSERT INTO `productos`(`codigo`, `idlote`, `descripcion`, `tipo`, `stock`, `stockminimo`, `precio_compra`, `precio_venta`, `ventasujeta`, `fecha_registro`, `reg_sanitario`, `idcategoria`, `idpresentacion`,
 `idcliente`, `idsintoma`, `idunidad`, `idtipoaf`, `estado`, `tipo_precio`)
@@ -150,10 +162,13 @@ if($res){
      });
     </script>");
     }else {
+      // Registrar error para debug
+      $error_msg = $obj->error();
+      error_log("Error al insertar producto: " . $error_msg . " - SQL: " . substr($sql, 0, 500));
       echo("<script>
-       alertify.alert('mensaje', 'algo salio mal vuelva a intentarlo!', function(){
-       alertify.success('Ok');
-      window.location.replace('index.php');
+       alertify.alert('mensaje', 'Error al registrar. Verifique que todos los campos estén correctos.', function(){
+       alertify.error('Error');
+      window.location.replace('insertar.php');
        });
       </script>");
     }

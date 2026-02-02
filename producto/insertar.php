@@ -228,12 +228,12 @@ foreach((array)$result_lote as $row) { $id_lote_default = $row['idlote']; }
 						<label>Tipo Afectacion(*)</label>
 						<select name="tafec" class='form-control'required>
 							<?php
-																	$result=$obj->consultar("select * from tipo_afectacion");
+																	$result=$objproductos->consultar("select * from tipo_afectacion");
 																	foreach((array)$result as $row){
 																	if($row['idtipoa']==$tafec){
-																		echo '<option value="'.$row['idtipoa'].'" selected>'.$row['descripcion'].'</option>';
+																		echo '<option value="'.htmlspecialchars($row['idtipoa'], ENT_QUOTES, 'UTF-8').'" selected>'.htmlspecialchars($row['descripcion'], ENT_QUOTES, 'UTF-8').'</option>';
 																	}else{
-																		echo '<option value="'.$row['idtipoa'].'">'.$row['descripcion'].'</option>';
+																		echo '<option value="'.htmlspecialchars($row['idtipoa'], ENT_QUOTES, 'UTF-8').'">'.htmlspecialchars($row['descripcion'], ENT_QUOTES, 'UTF-8').'</option>';
 																	}
 																}
 								?>
