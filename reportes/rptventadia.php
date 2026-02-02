@@ -1,12 +1,21 @@
 <?php ob_start();
 include("../seguridad.php");
 $usu=$_SESSION["usuario"];
+$tipo=$_SESSION["tipo"];
 include_once("../conexion/clsConexion.php");
 $obj=new clsConexion;
 date_default_timezone_set('america/lima');
 $fecha_actual = date("Y-m-d");
 $totalv = 0;
-$result=$obj->consultar("select * from venta WHERE fecha_emision='$fecha_actual'");
+$cond_usuario = '';
+if ($tipo == 'USUARIO') {
+    $usur = $obj->consultar("SELECT idusu FROM usuario WHERE usuario='" . $obj->real_escape_string($usu) . "'");
+    if ($usur && count($usur) > 0) {
+        $idusuario = (int)$usur[0]['idusu'];
+        $cond_usuario = " AND idusuario=$idusuario";
+    }
+}
+$result=$obj->consultar("SELECT * FROM venta WHERE fecha_emision='$fecha_actual' $cond_usuario ORDER BY idventa");
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html >

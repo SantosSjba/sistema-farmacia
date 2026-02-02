@@ -2,6 +2,7 @@
 ob_start();
 include("../seguridad.php");
 $usu=$_SESSION["usuario"];
+$tipo=$_SESSION["tipo"];
 include_once("../conexion/clsConexion.php");
 $obj=new clsConexion;
 $totalv = 0;
@@ -19,7 +20,15 @@ $hasta =trim($obj->real_escape_string(htmlentities(strip_tags($_GET['hasta'],ENT
 	$verHasta = '__/__/____';
 }
 
-$result=$obj->consultar("select * from venta WHERE fecha_emision BETWEEN '$desde' AND '$hasta'");
+$cond_usuario = '';
+if ($tipo == 'USUARIO') {
+    $usur = $obj->consultar("SELECT idusu FROM usuario WHERE usuario='" . $obj->real_escape_string($usu) . "'");
+    if ($usur && count($usur) > 0) {
+        $idusuario = (int)$usur[0]['idusu'];
+        $cond_usuario = " AND idusuario=$idusuario";
+    }
+}
+$result=$obj->consultar("SELECT * FROM venta WHERE fecha_emision BETWEEN '$desde' AND '$hasta' $cond_usuario ORDER BY fecha_emision, idventa");
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html >

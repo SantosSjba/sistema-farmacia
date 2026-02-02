@@ -141,13 +141,10 @@ if($caja_estado == '') {
             echo ' <li><a href="../caja/cierre.php"><span>Cierre de caja</span></a></li>';
            }?>
            <?php
-         if ($tipo=="ADMINISTRADOR" && $caja_estado=="Abierto" || $tipo=="USUARIO" && $caja_estado=="Abierto") {
+         // ADMIN siempre ve Seguimiento (para revisar todas las cajas). USUARIO solo cuando tiene caja abierta o cerrada
+         if ($tipo=="ADMINISTRADOR" || ($tipo=="USUARIO" && ($caja_estado=="Abierto" || $caja_estado=="Cerrado"))) {
            echo ' <li><a href="../caja/movimiento.php"><span>Seguimiento de caja</span></a></li>';
           }?>
-          <?php
-        if ($tipo=="ADMINISTRADOR" && $caja_estado=="Cerrado" || $tipo=="USUARIO" && $caja_estado=="Cerrado") {
-          echo ' <li><a href="../caja/movimiento.php"><span>Seguimiento de caja</span></a></li>';
-         }?>
            </ul>
          </li>
 

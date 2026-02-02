@@ -1,7 +1,8 @@
 <?php
 include("../seguridad.php");
 ob_start();
-$usu=$_SESSION["usuario"];
+$tipo = $_SESSION["tipo"];
+$usu = $_SESSION["usuario"];
 include("../conexion/clsConexion.php");
 $obj=new clsConexion;
 date_default_timezone_set('America/Lima');
@@ -13,9 +14,22 @@ $formaefectivo = 0;
 $formadeposito = 0;
 $formatarjeta=0;
 
-// Obtener usuario
-$usur = $obj->consultar("SELECT idusu FROM usuario WHERE usuario = '$usu'");
-if ($usur) {
+// ADMIN puede ver cuadre de cualquier usuario vía GET. USUARIO solo el propio.
+$usu_cuadre = $usu;
+$dia_cuadre = $dia;
+if ($tipo == 'ADMINISTRADOR' && isset($_GET['usuario']) && isset($_GET['fecha'])) {
+    $usu_cuadre = $obj->real_escape_string(trim($_GET['usuario']));
+    $fec_get = $obj->real_escape_string(trim($_GET['fecha']));
+    if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $fec_get)) {
+        $dia_cuadre = $fec_get;
+    }
+} elseif ($tipo == 'USUARIO') {
+    $usu_cuadre = $usu;
+}
+
+// Obtener idusu del cajero
+$usur = $obj->consultar("SELECT idusu FROM usuario WHERE usuario = '" . $obj->real_escape_string($usu_cuadre) . "'");
+if ($usur && count($usur) > 0) {
     foreach ((array)$usur as $row) {
         $usuario = $row['idusu'];
     }
@@ -23,37 +37,37 @@ if ($usur) {
     die('Error al obtener el usuario');
 }
 
-// Obtener monto
-$monto = $obj->consultar("SELECT * FROM caja_apertura WHERE usuario = '$usu' AND fecha = '$dia'");
-if ($monto) {
-    foreach ((array)$monto as $row) {
-        $monto = $row['monto'];
-        $caja = $row['caja'];
-        $turno = $row['turno'];
-    }
+// Obtener monto de caja_apertura (por usuario y fecha)
+$monto_res = $obj->consultar("SELECT * FROM caja_apertura WHERE usuario = '" . $obj->real_escape_string($usu_cuadre) . "' AND fecha = '" . $obj->real_escape_string($dia_cuadre) . "' ORDER BY idcaja_a DESC");
+$monto = 0; $caja = ''; $turno = '';
+if ($monto_res && count($monto_res) > 0) {
+    $row = $monto_res[0];
+    $monto = $row['monto'];
+    $caja = $row['caja'];
+    $turno = $row['turno'];
 } else {
-    die('Error al obtener el monto');
+    die('No hay datos de apertura de caja para el usuario y fecha seleccionados.');
 }
-// Obtener ventas en efectivo
-$ventas_e = $obj->consultar("SELECT * FROM venta WHERE fecha_emision = '$dia' AND idusuario = '$usuario' AND formadepago='EFECTIVO'");
+// Obtener ventas en efectivo (usar dia_cuadre y usuario del cajero)
+$ventas_e = $obj->consultar("SELECT * FROM venta WHERE fecha_emision = '" . $obj->real_escape_string($dia_cuadre) . "' AND idusuario = '$usuario' AND formadepago='EFECTIVO'");
     foreach ((array)$ventas_e as $row) {
         $ef = $formaefectivo += $row['total'];
         $efectivo = number_format($ef, 2);
     }
 // Obtener ventas con tarjeta
-$ventas_t = $obj->consultar("SELECT * FROM venta WHERE fecha_emision = '$dia' AND idusuario = '$usuario' AND formadepago='TARJETA'");
+$ventas_t = $obj->consultar("SELECT * FROM venta WHERE fecha_emision = '" . $obj->real_escape_string($dia_cuadre) . "' AND idusuario = '$usuario' AND formadepago='TARJETA'");
     foreach ((array)$ventas_t as $row) {
         $ta = $formatarjeta += $row['total'];
         $tarjeta = number_format($ta, 2);
     }
 // Obtener ventas con depositos
-$ventas_d = $obj->consultar("SELECT * FROM venta WHERE fecha_emision = '$dia' AND idusuario = '$usuario' AND formadepago='DEPOSITO EN CUENTA'");
+$ventas_d = $obj->consultar("SELECT * FROM venta WHERE fecha_emision = '" . $obj->real_escape_string($dia_cuadre) . "' AND idusuario = '$usuario' AND formadepago='DEPOSITO EN CUENTA'");
     foreach ((array)$ventas_d as $row) {
         $de = $formadeposito += $row['total'];
         $deposito = number_format($de, 2);
     }
-// Configuración
-$result = $obj->consultar("SELECT * FROM caja_cierre WHERE usuario = '$usu' AND fecha = '$dia'");
+// Obtener cierre de caja (por usuario y fecha del cuadre)
+$result = $obj->consultar("SELECT * FROM caja_cierre WHERE usuario = '" . $obj->real_escape_string($usu_cuadre) . "' AND fecha = '" . $obj->real_escape_string($dia_cuadre) . "'");
 
     foreach ((array)$result as $row) {
         $di = $row['diferencia'];
@@ -144,11 +158,11 @@ function regresa()
     </tr>
 	<tr>
 	  <td>FECHA CAJA:</td>
-	  <td><?php echo "$dia"; ?></td>
+	  <td><?php echo htmlspecialchars($dia_cuadre); ?></td>
     </tr>
 	<tr>
 	  <td>CAJERO:</td>
-	  <td><?php echo "$caja"; ?></td>
+	  <td><?php echo htmlspecialchars($usu_cuadre); ?></td>
     </tr>
 	<tr>
 		<td width="268">TURNO:</td>

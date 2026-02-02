@@ -23,6 +23,10 @@ if ($fecha_desde > $fecha_hasta) {
 	$fecha_hasta = $ultimo_dia_mes;
 }
 
+// Filtro por usuario: 0 o vacío = todos, sino idusu específico
+$filtro_usuario = isset($_GET['filtro_usuario']) ? trim($_GET['filtro_usuario']) : '';
+$filtro_usuario = ($filtro_usuario === '' || $filtro_usuario === '0' || $filtro_usuario === 'todos') ? 0 : (int)$filtro_usuario;
+
 $m='';
 $resultcaja=$obj->consultar("SELECT * FROM caja_apertura WHERE usuario='$usu' and fecha='$dia'");
               foreach((array)$resultcaja as $row){
@@ -40,33 +44,30 @@ $ganancia = 0;
 $gastos = 0;
 $neto = 0;
 
-// Obtener ID de usuario (tabla usuario, campo idusu)
-$usur_id = $obj->consultar("SELECT idusu FROM usuario WHERE usuario='" . $obj->real_escape_string($usu) . "'");
-$idusuario = 0;
-foreach((array)$usur_id as $row){
-    $idusuario = (int)($row['idusu'] ?? 0);
-}
-
-// Escapar fechas para consultas (tabla venta: fecha_emision date, idusuario int, estado enum)
+// Escapar fechas para consultas (tabla venta: fecha_emision date, estado enum)
 $fecha_desde_sql = $obj->real_escape_string($fecha_desde);
 $fecha_hasta_sql = $obj->real_escape_string($fecha_hasta);
 
-// Calcular ventas del rango de fechas (excluir ventas anuladas)
-if($idusuario > 0) {
-    $result_ventas = $obj->consultar("SELECT COALESCE(SUM(total), 0) AS total_ventas FROM venta WHERE fecha_emision BETWEEN '" . $fecha_desde_sql . "' AND '" . $fecha_hasta_sql . "' AND idusuario=" . $idusuario . " AND estado != 'anulado'");
-    foreach((array)$result_ventas as $row){
-        $ventas = isset($row['total_ventas']) ? (float)$row['total_ventas'] : 0;
-    }
+// Condición por usuario: 0 = todos, sino filtrar por idusuario
+$cond_usuario = ($filtro_usuario > 0) ? " AND venta.idusuario=" . $filtro_usuario : "";
+$cond_usuario_v = ($filtro_usuario > 0) ? " AND idusuario=" . $filtro_usuario : "";
 
-    // Calcular costos del rango (detalleventa + productos + venta; excluir anuladas)
-    $result_costos = $obj->consultar("SELECT COALESCE(SUM(productos.precio_compra * detalleventa.cantidad), 0) AS total_costos 
-                                       FROM detalleventa 
-                                       INNER JOIN productos ON detalleventa.idproducto = productos.idproducto 
-                                       INNER JOIN venta ON detalleventa.idventa = venta.idventa 
-                                       WHERE venta.fecha_emision BETWEEN '" . $fecha_desde_sql . "' AND '" . $fecha_hasta_sql . "' AND venta.idusuario=" . $idusuario . " AND venta.estado != 'anulado'");
-    foreach((array)$result_costos as $row){
-        $costos = isset($row['total_costos']) ? (float)$row['total_costos'] : 0;
-    }
+// Lista de usuarios para el filtro (tabla usuario)
+$lista_usuarios = $obj->consultar("SELECT idusu, usuario, nombres FROM usuario WHERE estado='Activo' ORDER BY nombres");
+
+// ADMINISTRADOR: Resumen ventas (total o por usuario)
+$result_ventas = $obj->consultar("SELECT COALESCE(SUM(total), 0) AS total_ventas FROM venta WHERE fecha_emision BETWEEN '" . $fecha_desde_sql . "' AND '" . $fecha_hasta_sql . "' AND estado != 'anulado'" . $cond_usuario_v);
+foreach((array)$result_ventas as $row){
+    $ventas = isset($row['total_ventas']) ? (float)$row['total_ventas'] : 0;
+}
+
+$result_costos = $obj->consultar("SELECT COALESCE(SUM(productos.precio_compra * detalleventa.cantidad), 0) AS total_costos 
+                                   FROM detalleventa 
+                                   INNER JOIN productos ON detalleventa.idproducto = productos.idproducto 
+                                   INNER JOIN venta ON detalleventa.idventa = venta.idventa 
+                                   WHERE venta.fecha_emision BETWEEN '" . $fecha_desde_sql . "' AND '" . $fecha_hasta_sql . "' AND venta.estado != 'anulado'" . $cond_usuario);
+foreach((array)$result_costos as $row){
+    $costos = isset($row['total_costos']) ? (float)$row['total_costos'] : 0;
 }
 
 // Calcular ganancia
@@ -157,10 +158,29 @@ echo $dias[date('w')]." ".date('d')." de ".$meses[date('n')-1]. " del ".date('Y'
 					<input type="date" name="fecha_desde" value="<?php echo htmlspecialchars($fecha_desde); ?>" class="form-control" style="margin: 0 10px 10px 0;">
 					<label class="control-label">Hasta:</label>
 					<input type="date" name="fecha_hasta" value="<?php echo htmlspecialchars($fecha_hasta); ?>" class="form-control" style="margin: 0 10px 10px 0;">
+					<label class="control-label">Usuario:</label>
+					<select name="filtro_usuario" class="form-control" style="margin: 0 10px 10px 0;">
+						<option value="0" <?php echo ($filtro_usuario == 0) ? 'selected' : ''; ?>>Todos (General)</option>
+						<?php foreach ((array)$lista_usuarios as $u): ?>
+						<option value="<?php echo (int)$u['idusu']; ?>" <?php echo ($filtro_usuario == (int)$u['idusu']) ? 'selected' : ''; ?>>
+							<?php echo htmlspecialchars($u['nombres'] ?: $u['usuario']); ?>
+						</option>
+						<?php endforeach; ?>
+					</select>
 					<button type="submit" class="btn btn-primary"><i class="entypo-search"></i> Filtrar</button>
 					<a href="index.php" class="btn btn-default" style="margin-left: 5px;">Mes actual</a>
 				</form>
-				<p style="color: #666; margin-bottom: 15px;"><strong>Período:</strong> <?php echo date('d/m/Y', strtotime($fecha_desde)); ?> – <?php echo date('d/m/Y', strtotime($fecha_hasta)); ?></p>
+				<p style="color: #666; margin-bottom: 15px;">
+					<strong>Período:</strong> <?php echo date('d/m/Y', strtotime($fecha_desde)); ?> – <?php echo date('d/m/Y', strtotime($fecha_hasta)); ?>
+					<?php if ($filtro_usuario > 0): 
+						$nom_user = 'Usuario';
+						foreach ((array)$lista_usuarios as $u) { if ((int)$u['idusu'] == $filtro_usuario) { $nom_user = $u['nombres'] ?: $u['usuario']; break; } }
+					?>
+					| <strong>Usuario:</strong> <?php echo htmlspecialchars($nom_user); ?>
+					<?php else: ?>
+					| <strong>Vista:</strong> Total empresa
+					<?php endif; ?>
+				</p>
 				<div class="row">
 					<div class="col-xs-12 col-sm-6 col-md-2 col-lg-2" style="margin-bottom: 10px; padding: 0 5px;">
 						<div style="text-align: center; padding: 20px; background-color: #f5f5f5; border-radius: 5px; min-height: 100px;">
