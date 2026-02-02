@@ -131,7 +131,8 @@ if($caja_estado == '') {
          <a href=""><i class="entypo-box"></i><span>Caja</span></a>
            <ul>
            <?php
-         if ($tipo=="ADMINISTRADOR" && $caja_estado=="" || $tipo=="USUARIO" && $caja_estado=="") {
+         // Permitir aperturar caja cuando no hay caja abierta (incluye después de cerrar = permitir más de una apertura por turno)
+         if (($tipo=="ADMINISTRADOR" || $tipo=="USUARIO") && $caja_estado!="Abierto") {
            echo '
           <li><a href="../caja/apertura.php"><span>Apertura caja</span></a></li>';
          }?>
