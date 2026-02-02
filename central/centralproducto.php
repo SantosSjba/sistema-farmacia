@@ -5,9 +5,22 @@ include_once("../conexion/clsConexion.php");
 $obj=new clsConexion;
 $dia= date("Y-m-d");
 $caja_estado='';
-$result=$obj->consultar("SELECT * FROM caja_apertura WHERE usuario= '$usu' AND fecha= '$dia'");
-foreach ((array)$result as $row) {
+$caja_fecha='';
+
+// Primero verificar si hay una caja ABIERTA de cualquier día (incluyendo días anteriores)
+$result_abierta=$obj->consultar("SELECT * FROM caja_apertura WHERE usuario= '$usu' AND estado='Abierto' ORDER BY fecha DESC, idcaja_a DESC LIMIT 1");
+foreach ((array)$result_abierta as $row) {
 	$caja_estado=$row['estado'];
+	$caja_fecha=$row['fecha'];
+}
+
+// Si no hay caja abierta, verificar el estado de la caja del día actual
+if($caja_estado == '') {
+	$result=$obj->consultar("SELECT * FROM caja_apertura WHERE usuario= '$usu' AND fecha= '$dia' ORDER BY idcaja_a DESC LIMIT 1");
+	foreach ((array)$result as $row) {
+		$caja_estado=$row['estado'];
+		$caja_fecha=$row['fecha'];
+	}
 }
 ?>
 <!DOCTYPE html>

@@ -24,7 +24,8 @@ $diferencia=trim($obj->real_escape_string(htmlentities(strip_tags($_POST['txtfal
 
 $sql="INSERT INTO `caja_cierre`(`fecha`, `caja`, `turno`, `hora`, `usuario`, `pagos_efectivo`, `total_venta`, `monto_a`, `caja_sistema`, `efectivo_caja`, `diferencia`)
 VALUES('$fec','$caja','$turno','$hor','$usu','$pago_e','$t_v','$mon','$caja_s','$efec_c','$diferencia')";
-$sqlu="UPDATE `caja_apertura` SET `estado`='Cerrado' WHERE usuario='$usu'";
+// Cerrar solo la caja del día actual para este usuario
+$sqlu="UPDATE `caja_apertura` SET `estado`='Cerrado' WHERE usuario='$usu' AND fecha='$fec'";
 $obj->ejecutar($sql);
 $obj->ejecutar($sqlu);
 	echo"<script>

@@ -16,6 +16,7 @@ $formadeposito = 0;
 $total=0;
 $formatarjeta=0;
 $usu = $_SESSION["usuario"];
+$fecha_caja = $dia; // Por defecto usar fecha actual
 
 // Obtener ID de usuario
 $usur = $obj->consultar("SELECT idusu FROM usuario WHERE usuario= '$usu'");
@@ -25,31 +26,38 @@ if (empty($usur)) {
 foreach ($usur as $row) {
 	$usuario = $row['idusu'];
 }
-// obtener el monto de Apertura ,cajero , turno segun la fecha la sucursal y el usuario
-$monto = $obj->consultar("SELECT * FROM caja_apertura WHERE usuario= '$usu' AND fecha= '$dia'");
+
+// Buscar primero si hay una caja ABIERTA (puede ser de cualquier día)
+$monto = $obj->consultar("SELECT * FROM caja_apertura WHERE usuario= '$usu' AND estado='Abierto' ORDER BY fecha DESC, idcaja_a DESC LIMIT 1");
 if (empty($monto)) {
-	die("No se obtuvieron resultados para la consulta de apertura.");
+	// Si no hay caja abierta, buscar la del día actual
+	$monto = $obj->consultar("SELECT * FROM caja_apertura WHERE usuario= '$usu' AND fecha= '$dia' ORDER BY idcaja_a DESC LIMIT 1");
+}
+if (empty($monto)) {
+	echo "<script>alert('No tiene una caja abierta. Debe aperturar caja primero.'); window.location='apertura.php';</script>";
+	exit;
 }
 
 foreach ($monto as $row) {
 	$mon = $row['monto'];
 	$caja = $row['caja'];
 	$turno = $row['turno'];
+	$fecha_caja = $row['fecha']; // Usar la fecha de apertura de la caja
 }
-// Obtener ventas en efectivo
-$ventas_e = $obj->consultar("SELECT * FROM venta WHERE fecha_emision = '$dia' AND idusuario = '$usuario' AND formadepago='EFECTIVO'");
+// Obtener ventas en efectivo (usar la fecha de la caja, no la fecha actual)
+$ventas_e = $obj->consultar("SELECT * FROM venta WHERE fecha_emision = '$fecha_caja' AND idusuario = '$usuario' AND formadepago='EFECTIVO'");
 foreach ((array) $ventas_e as $row) {
 	$ef = $formaefectivo += $row['total'];
 	$efectivo = number_format($ef, 2);
 }
 // Obtener ventas con tarjeta
-$ventas_t = $obj->consultar("SELECT * FROM venta WHERE fecha_emision = '$dia' AND idusuario = '$usuario' AND formadepago='TARJETA'");
+$ventas_t = $obj->consultar("SELECT * FROM venta WHERE fecha_emision = '$fecha_caja' AND idusuario = '$usuario' AND formadepago='TARJETA'");
 foreach ((array) $ventas_t as $row) {
 	$ta = $formatarjeta += $row['total'];
 	$tarjeta = number_format($ta, 2);
 }
 // Obtener ventas con depositos
-$ventas_d = $obj->consultar("SELECT * FROM venta WHERE fecha_emision = '$dia' AND idusuario = '$usuario' AND formadepago='DEPOSITO EN CUENTA'");
+$ventas_d = $obj->consultar("SELECT * FROM venta WHERE fecha_emision = '$fecha_caja' AND idusuario = '$usuario' AND formadepago='DEPOSITO EN CUENTA'");
 foreach ((array) $ventas_d as $row) {
 	$de = $formadeposito += $row['total'];
 	$deposito = number_format($de, 2);
@@ -86,13 +94,16 @@ foreach ((array) $ventas as $row) {
 										class="col-sm-8 control-label"><b>CAJERO:.....<?php echo "$usu"; ?></b></label>
 								</div>
 							</div>
-							<div class="form-group">
-								<label for="field-1" class="col-sm-3 control-label">Fecha:</label>
-								<div class="col-sm-5">
-									<input type="text" name="txtfec" class="form-control" required readonly="true"
-										value="<?php echo "$dia"; ?>">
-								</div>
+						<div class="form-group">
+							<label for="field-1" class="col-sm-3 control-label">Fecha:</label>
+							<div class="col-sm-5">
+								<input type="text" name="txtfec" class="form-control" required readonly="true"
+									value="<?php echo "$fecha_caja"; ?>">
+								<?php if($fecha_caja != $dia): ?>
+								<small class="text-warning"><strong>Nota:</strong> Esta caja fue abierta el <?php echo $fecha_caja; ?></small>
+								<?php endif; ?>
 							</div>
+						</div>
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Caja:</label>
 								<div class="col-sm-5">

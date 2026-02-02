@@ -56,9 +56,9 @@ $data=$objproductos->consultar("SELECT * FROM productos WHERE idproducto='".$obj
 							<input type="text" class="form-control"  placeholder="ingrese codigo de barra" name="txtcb" id="txtcb" value="<?php echo $cb;?>">
 					</div>
 
-					<div class="col-md-6 form-group">
-							<label><strong>Lote(*)</strong></label>
-							<select name="txtlo" class='form-control'required>
+				<div class="col-md-6 form-group">
+						<label><strong>Lote</strong></label>
+						<select name="txtlo" class='form-control'>
 								<?php
 																		$result=$objproductos->consultar("select * from lote");
 																		foreach((array)$result as $row){
@@ -77,13 +77,14 @@ $data=$objproductos->consultar("SELECT * FROM productos WHERE idproducto='".$obj
 					<input type="text" class="form-control" required  placeholder="ingrese su descripcion" name="txtde" value="<?php echo $n;?>">
 					</div>
 
-					<div class="col-md-6 form-group">
-						<label><strong>Tipo(*)</strong></label>
-							<select name="txtti" class="form-control" required>
-																<option value="Generico" <?php  if($tipo=='Generico'){ echo 'selected'; } ?>>Generico</option>
-																<option value="No Generico" <?php if($tipo=='No Generico'){ echo 'selected'; } ?>>No generico</option>
-							</select>
-					</div>
+				<div class="col-md-6 form-group">
+					<label><strong>Tipo</strong></label>
+						<select name="txtti" class="form-control">
+															<option value="Generico" <?php  if($tipo=='Generico'){ echo 'selected'; } ?>>Generico</option>
+															<option value="No Generico" <?php if($tipo=='No Generico'){ echo 'selected'; } ?>>No generico</option>
+															<option value="No Aplica" <?php if($tipo=='No Aplica'){ echo 'selected'; } ?>>No Aplica (Producto General)</option>
+						</select>
+				</div>
 
 					<div class="col-md-6 form-group">
 							<label><strong>Stock(*)</strong></label>
@@ -106,13 +107,14 @@ $data=$objproductos->consultar("SELECT * FROM productos WHERE idproducto='".$obj
 							<label><strong>Descuento</strong></label>
 						<input type="text"  name="txtdes"class="form-control" placeholder="ingrese el descuento" value="<?php echo $des;?>">
 					</div> -->
-					<div class="col-md-6 form-group">
-						<label><strong>Venta Sujeta(*)</strong></label>
-							<select name="txtvs" class="form-control" required>
-																<option value="Con receta medica" <?php  if($sujeta=='Con receta medica'){ echo 'selected'; } ?>>Con receta medica</option>
-																<option value="sin receta medica" <?php if($sujeta=='sin receta medica'){ echo 'selected'; } ?>>sin receta medica</option>
-							</select>
-					</div>
+				<div class="col-md-6 form-group">
+					<label><strong>Venta Sujeta</strong></label>
+						<select name="txtvs" class="form-control">
+															<option value="Con receta medica" <?php  if($sujeta=='Con receta medica'){ echo 'selected'; } ?>>Con receta medica</option>
+															<option value="sin receta medica" <?php if($sujeta=='sin receta medica'){ echo 'selected'; } ?>>sin receta medica</option>
+															<option value="No aplica" <?php if($sujeta=='No aplica'){ echo 'selected'; } ?>>No aplica (Producto General)</option>
+						</select>
+				</div>
 					<div class="col-md-6 form-group">
 						<label>Fecha De Registro(*)</label>
 							 <input type="text" name="txtfec" value="<?php echo $fec;?>" require class="form-control" readonly />
@@ -121,9 +123,9 @@ $data=$objproductos->consultar("SELECT * FROM productos WHERE idproducto='".$obj
 							<label><strong>Registro Sanitario</strong></label>
 						<input type="text"   name="txtrs"class="form-control"  placeholder="ingrese el registro sanitario" value="<?php echo $rs;?>">
 					</div>
-					<div class="col-md-6 form-group">
-							<label><strong>Forma Farmaceutica(*)</strong></label>
-							<select name="tcat" class='form-control'required>
+				<div class="col-md-6 form-group">
+						<label><strong>Forma Farmaceutica</strong></label>
+						<select name="tcat" class='form-control'>
 								<?php
 																		$result=$objproductos->consultar("select * from categoria");
 																		foreach((array)$result as $row){
@@ -151,24 +153,25 @@ $data=$objproductos->consultar("SELECT * FROM productos WHERE idproducto='".$obj
 									?>
 							</select>
 					</div>
-					<div class="col-md-6 form-group">
-						<label>Laboratorio(*)</label>
-							<select name="tidcli" class='form-control' required>
-								<?php
-																		$result=$objproductos->consultar("select * from cliente where tipo='laboratorio'");
-																		foreach((array)$result as $row){
-																		if($row['idcliente']==$tla){
-																			echo '<option value="'.$row['idcliente'].'" selected>'.$row['nombres'].'</option>';
-																		}else{
-																			echo '<option value="'.$row['idcliente'].'">'.$row['nombres'].'</option>';
-																		}
-																	}
-									?>
-							</select>
-					</div>
-					<div class="col-md-6 form-group">
-						<label>Sintomas(*)</label>
-							<select name="tsi" class='form-control' required>
+			<div class="col-md-6 form-group">
+				<label>Laboratorio/Proveedor</label>
+					<select name="tidcli" class='form-control'>
+						<option value="">-- Seleccione Laboratorio --</option>
+							<?php
+								$result=$objproductos->consultar("SELECT * FROM cliente WHERE LOWER(TRIM(tipo))='laboratorio' ORDER BY nombres ASC");
+								foreach((array)$result as $row){
+									if($row['idcliente']==$tla){
+										echo '<option value="'.$row['idcliente'].'" selected>'.$row['nombres'].'</option>';
+									}else{
+										echo '<option value="'.$row['idcliente'].'">'.$row['nombres'].'</option>';
+									}
+								}
+							?>
+						</select>
+				</div>
+				<div class="col-md-6 form-group">
+					<label>Sintomas</label>
+						<select name="tsi" class='form-control'>
 								<?php
 																		$result=$objproductos->consultar("select * from sintoma");
 																		foreach((array)$result as $row){

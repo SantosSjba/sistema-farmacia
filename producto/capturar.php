@@ -31,6 +31,28 @@ if($funcion=="modificar"){
   $tafec=trim($obj->real_escape_string($_POST['tafec'],ENT_QUOTES));
   $tipo_pre=trim($obj->real_escape_string($_POST['tipo_pre'],ENT_QUOTES));
 
+  // Valores por defecto para productos generales (cuando no se selecciona o está vacío)
+  if(empty($ti) || $ti == 'No Aplica') $ti = 'No Aplica';
+  if(empty($vs) || $vs == 'No aplica') $vs = 'No aplica';
+  
+  // Si categoría está vacía, buscar la primera disponible
+  if(empty($cat)) {
+    $result_cat = $obj->consultar("SELECT idcategoria FROM categoria LIMIT 1");
+    foreach((array)$result_cat as $row) { $cat = $row['idcategoria']; }
+  }
+  
+  // Si síntoma está vacío, buscar el primero disponible
+  if(empty($si)) {
+    $result_sin = $obj->consultar("SELECT idsintoma FROM sintoma LIMIT 1");
+    foreach((array)$result_sin as $row) { $si = $row['idsintoma']; }
+  }
+  
+  // Si laboratorio está vacío, buscar el primero disponible
+  if(empty($tidcli)) {
+    $result_lab = $obj->consultar("SELECT idcliente FROM cliente WHERE tipo='laboratorio' LIMIT 1");
+    foreach((array)$result_lab as $row) { $tidcli = $row['idcliente']; }
+  }
+
 $sql="UPDATE `productos` SET `codigo`='$cb',`idlote`='$lo',`descripcion`='$de',
 `tipo`='$ti',`stock`='$st',`stockminimo`='$stm',`precio_compra`='$pc',`precio_venta`='$pv',
 `ventasujeta`='$vs',`fecha_registro`='$fec',`reg_sanitario`='$rs',
@@ -75,6 +97,46 @@ if($funcion=="registrar"){
   $estado=trim($obj->real_escape_string($_POST['txte'],ENT_QUOTES));
   $tafec=trim($obj->real_escape_string($_POST['tafec'],ENT_QUOTES));
   $tipo_pre=trim($obj->real_escape_string($_POST['tipo_pre'],ENT_QUOTES));
+  
+  // Valores por defecto para productos generales (cuando no se selecciona o está vacío)
+  if(empty($ti) || $ti == 'No Aplica') $ti = 'No Aplica';
+  if(empty($vs) || $vs == 'No aplica') $vs = 'No aplica';
+  
+  // Si categoría está vacía, buscar "No Aplica" o la primera disponible
+  if(empty($cat)) {
+    $result_cat = $obj->consultar("SELECT idcategoria FROM categoria WHERE forma_farmaceutica LIKE '%No Aplica%' LIMIT 1");
+    if(empty($result_cat)) {
+      $result_cat = $obj->consultar("SELECT idcategoria FROM categoria LIMIT 1");
+    }
+    foreach((array)$result_cat as $row) { $cat = $row['idcategoria']; }
+  }
+  
+  // Si síntoma está vacío, buscar "No Aplica" o el primero disponible
+  if(empty($si)) {
+    $result_sin = $obj->consultar("SELECT idsintoma FROM sintoma WHERE sintoma LIKE '%No Aplica%' LIMIT 1");
+    if(empty($result_sin)) {
+      $result_sin = $obj->consultar("SELECT idsintoma FROM sintoma LIMIT 1");
+    }
+    foreach((array)$result_sin as $row) { $si = $row['idsintoma']; }
+  }
+  
+  // Si laboratorio está vacío, buscar "SIN LABORATORIO" o el primero disponible
+  if(empty($tidcli)) {
+    $result_lab = $obj->consultar("SELECT idcliente FROM cliente WHERE tipo='laboratorio' AND (nombres LIKE '%SIN LABORATORIO%' OR nombres LIKE '%GENERICO%') LIMIT 1");
+    if(empty($result_lab)) {
+      $result_lab = $obj->consultar("SELECT idcliente FROM cliente WHERE tipo='laboratorio' LIMIT 1");
+    }
+    foreach((array)$result_lab as $row) { $tidcli = $row['idcliente']; }
+  }
+  
+  // Si lote está vacío, buscar "SIN LOTE" o el primero disponible
+  if(empty($lo)) {
+    $result_lote = $obj->consultar("SELECT idlote FROM lote WHERE numero LIKE '%SIN LOTE%' LIMIT 1");
+    if(empty($result_lote)) {
+      $result_lote = $obj->consultar("SELECT idlote FROM lote LIMIT 1");
+    }
+    foreach((array)$result_lote as $row) { $lo = $row['idlote']; }
+  }
 
 $sql="INSERT INTO `productos`(`codigo`, `idlote`, `descripcion`, `tipo`, `stock`, `stockminimo`, `precio_compra`, `precio_venta`, `ventasujeta`, `fecha_registro`, `reg_sanitario`, `idcategoria`, `idpresentacion`,
 `idcliente`, `idsintoma`, `idunidad`, `idtipoaf`, `estado`, `tipo_precio`)
