@@ -3,16 +3,12 @@ include("../seguridad.php");
 include_once("../central/centralproducto.php");
 include_once("../conexion/clsConexion.php");
 $obj = new clsConexion;
+date_default_timezone_set('america/lima');
 
-$primer_dia = date("Y-m-01");
-$ultimo_dia = date("Y-m-t");
-$desde = isset($_GET['desde']) ? trim($_GET['desde']) : $primer_dia;
-$hasta = isset($_GET['hasta']) ? trim($_GET['hasta']) : $ultimo_dia;
-if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $desde)) $desde = $primer_dia;
-if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $hasta)) $hasta = $ultimo_dia;
-if ($desde > $hasta) { $desde = $primer_dia; $hasta = $ultimo_dia; }
+$fecha_actual = isset($_GET['fecha']) ? trim($_GET['fecha']) : date("Y-m-d");
+if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $fecha_actual)) $fecha_actual = date("Y-m-d");
 
-$result = $obj->consultar("SELECT * FROM compra WHERE fecha BETWEEN '" . $obj->real_escape_string($desde) . "' AND '" . $obj->real_escape_string($hasta) . "' ORDER BY fecha, idcompra");
+$result = $obj->consultar("SELECT * FROM compra WHERE fecha='" . $obj->real_escape_string($fecha_actual) . "' ORDER BY idcompra");
 $totalv = 0;
 foreach ((array)$result as $row) { $totalv += $row['total']; }
 ?>
@@ -20,29 +16,27 @@ foreach ((array)$result as $row) { $totalv += $row['total']; }
 <html>
 <head>
 <meta charset="utf-8">
-<title>Reporte de Compras</title>
+<title>Reporte Compras del Día</title>
 </head>
 <body>
 <div class="page-container">
 <div class="main-content">
 <?php include('../central/cabecera.php');?>
 <hr/>
-<h2>Reporte de Compras</h2>
+<h2>Reporte Compras del Día</h2>
 <br/>
 <form method="get" action="" class="form-inline">
 <table class="table table-bordered">
 <tr>
-	<td><b>Desde</b></td>
-	<td><input type="date" name="desde" value="<?php echo htmlspecialchars($desde); ?>" class="form-control"/></td>
-	<td><b>Hasta</b></td>
-	<td><input type="date" name="hasta" value="<?php echo htmlspecialchars($hasta); ?>" class="form-control"/></td>
+	<td><b>Fecha</b></td>
+	<td><input type="date" name="fecha" value="<?php echo htmlspecialchars($fecha_actual); ?>" class="form-control"/></td>
 	<td><button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-search"></span> Ver reporte</button></td>
-	<td><a href="rptrango2compra.php?desde=<?php echo urlencode($desde); ?>&hasta=<?php echo urlencode($hasta); ?>" target="_blank" class="btn btn-info"><span class="glyphicon glyphicon-print"></span> Imprimir PDF</a></td>
+	<td><a href="rptcompradia.php?fecha=<?php echo urlencode($fecha_actual); ?>" target="_blank" class="btn btn-info"><span class="glyphicon glyphicon-print"></span> Imprimir PDF</a></td>
 </tr>
 </table>
 </form>
 <br/>
-<p><strong>Período:</strong> <?php echo date('d/m/Y', strtotime($desde)); ?> – <?php echo date('d/m/Y', strtotime($hasta)); ?></p>
+<p><strong>Fecha:</strong> <?php echo date('d/m/Y', strtotime($fecha_actual)); ?></p>
 <div class="table-responsive">
 <table class="table table-bordered table-striped">
 <thead>

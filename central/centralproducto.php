@@ -166,9 +166,9 @@ if($caja_estado == '') {
 			<a href=""><i class="entypo-chart-bar"></i><span>Reportes</span></a>
       <ul>
 				<li><a href="../reportes/rptrango1venta.php"><span>Rpt.Ventas</span></a></li>
-        	<li><a href="../reportes/rptventadia.php"><span>Rpt.Ventas Del Dia</span></a></li>
+        	<li><a href="../reportes/rptventadia_ver.php"><span>Rpt.Ventas Del Dia</span></a></li>
 				<li><a href="../reportes/rptrango1compra.php"><span>Rpt.Compras</span></a></li>
-        <li><a href="../reportes/rptcompradia.php"><span>Rpt.Compras Del Dia</span></a></li>
+        <li><a href="../reportes/rptcompradia_ver.php"><span>Rpt.Compras Del Dia</span></a></li>
 			</ul>
 			</li>';
 				}

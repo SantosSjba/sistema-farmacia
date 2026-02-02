@@ -25,10 +25,15 @@ if ($tipo == 'USUARIO') {
     $usur = $obj->consultar("SELECT idusu FROM usuario WHERE usuario='" . $obj->real_escape_string($usu) . "'");
     if ($usur && count($usur) > 0) {
         $idusuario = (int)$usur[0]['idusu'];
-        $cond_usuario = " AND idusuario=$idusuario";
+        $cond_usuario = " AND v.idusuario=$idusuario";
     }
 }
-$result=$obj->consultar("SELECT * FROM venta WHERE fecha_emision BETWEEN '$desde' AND '$hasta' $cond_usuario ORDER BY fecha_emision, idventa");
+$result=$obj->consultar("SELECT v.idventa, v.fecha_emision, v.total, dv.item, dv.cantidad, dv.valor_unitario, dv.importe_total, p.descripcion as producto
+FROM venta v
+INNER JOIN detalleventa dv ON v.idventa = dv.idventa
+INNER JOIN productos p ON dv.idproducto = p.idproducto
+WHERE v.fecha_emision BETWEEN '$desde' AND '$hasta' $cond_usuario AND v.estado != 'anulado'
+ORDER BY v.fecha_emision, v.idventa, dv.item");
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html >
@@ -37,54 +42,46 @@ $result=$obj->consultar("SELECT * FROM venta WHERE fecha_emision BETWEEN '$desde
 <title>lista de Ventas</title>
 
 <style type="text/css">
-ne {
-	font-weight: bold;
-}
-ne {
-	font-weight: bold;
-}
-ta {
-	font-size: 16px;
-}
-#n {
-	text-align: center;
-	font-weight: bold;
-	font-size: 24px;
-	font-family: Georgia, "Times New Roman", Times, serif;
-	color: #000;
-}
-.g {
-	font-family: Georgia, "Times New Roman", Times, serif;
-}
-#l {
-	font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
-}
+body { max-width: 100%; }
+table.rpt-tabla { width: 100%; max-width: 100%; table-layout: fixed; font-size: 11px; }
+table.rpt-tabla th, table.rpt-tabla td { overflow: hidden; text-overflow: ellipsis; word-wrap: break-word; }
+#n { text-align: center; font-weight: bold; font-size: 24px; }
 </style>
 </head>
 
-<body class="n">
-<table width="280" height="65" border="1" align="center" cellspacing="0">
+<body class="n" style="max-width: 100%;">
+<table width="100%" border="1" align="center" cellspacing="0">
   <tr>
-    <td width="241" bgcolor="#66CCCC" id="n">LISTADO DE VENTAS</td>
+    <td bgcolor="#66CCCC" id="n">LISTADO DE VENTAS</td>
   </tr>
     <tr>
-          <td  bgcolor="#66CCCC" align="center"><?php echo 'Desde:'.$verDesde."   ".'hasta:'.$verHasta ?></td>
+          <td bgcolor="#66CCCC" align="center"><?php echo 'Desde:'.$verDesde."   ".'hasta:'.$verHasta ?></td>
         </tr>
 </table>
 <p>&nbsp;</p>
-<table width="541" border="1" align="center" cellspacing="0">
+<table class="rpt-tabla" width="100%" border="1" align="center" cellspacing="0">
   <tr id="l">
-		<th width="80" bgcolor="#66CCCC" scope="col">Numero</th>
-		<th width="66" bgcolor="#66CCCC" scope="col">Fecha</th>
-		<th width="66" bgcolor="#66CCCC" scope="col">Total</th>
+		<th width="12%" bgcolor="#66CCCC" scope="col">Fecha</th>
+		<th width="38%" bgcolor="#66CCCC" scope="col">Producto</th>
+		<th width="8%" bgcolor="#66CCCC" scope="col">Cant.</th>
+		<th width="10%" bgcolor="#66CCCC" scope="col">P.Unit</th>
+		<th width="12%" bgcolor="#66CCCC" scope="col">Subtotal</th>
+		<th width="12%" bgcolor="#66CCCC" scope="col">Total Venta</th>
    </tr>
-   <?php foreach((array) $result as $row){
-     	$totalv = $totalv + $row['total'];
+   <?php 
+   $idventa_ant = 0;
+   foreach((array) $result as $row){
+     	$totalv = $totalv + $row['importe_total'];
+     	$totalventa_td = ($idventa_ant != $row['idventa']) ? number_format($row['total'], 2) : '';
+     	if ($idventa_ant != $row['idventa']) $idventa_ant = $row['idventa'];
      ?>
    <tr>
-		 <td><?php echo $row['idventa']; ?></span></td>
-		 <td><?php echo $row['fecha_emision']; ?></span></td>
-		 <td><?php echo $row['total']; ?></span></td>
+		 <td><?php echo $row['fecha_emision']; ?></td>
+		 <td><?php echo htmlspecialchars($row['producto']); ?></td>
+		 <td><?php echo $row['cantidad']; ?></td>
+		 <td><?php echo number_format($row['valor_unitario'], 2); ?></td>
+		 <td><?php echo number_format($row['importe_total'], 2); ?></td>
+		 <td><?php echo $totalventa_td; ?></td>
    </tr>
   <?php };?>
  </table>

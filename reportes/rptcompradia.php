@@ -4,7 +4,7 @@ $usu=$_SESSION["usuario"];
 include_once("../conexion/clsConexion.php");
 $obj=new clsConexion;
 date_default_timezone_set('america/lima');
-$fecha_actual = date("Y-m-d");
+$fecha_actual = isset($_GET['fecha']) && preg_match('/^\d{4}-\d{2}-\d{2}$/', trim($_GET['fecha'])) ? trim($_GET['fecha']) : date("Y-m-d");
 $totalv = 0;
 $result=$obj->consultar("select * from compra WHERE fecha='$fecha_actual' ");
 ?>

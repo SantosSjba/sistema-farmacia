@@ -5,14 +5,10 @@ include_once("../conexion/clsConexion.php");
 $obj = new clsConexion;
 $usu = $_SESSION["usuario"];
 $tipo = $_SESSION["tipo"];
+date_default_timezone_set('america/lima');
 
-$primer_dia = date("Y-m-01");
-$ultimo_dia = date("Y-m-t");
-$desde = isset($_GET['desde']) ? trim($_GET['desde']) : $primer_dia;
-$hasta = isset($_GET['hasta']) ? trim($_GET['hasta']) : $ultimo_dia;
-if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $desde)) $desde = $primer_dia;
-if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $hasta)) $hasta = $ultimo_dia;
-if ($desde > $hasta) { $desde = $primer_dia; $hasta = $ultimo_dia; }
+$fecha_actual = isset($_GET['fecha']) ? trim($_GET['fecha']) : date("Y-m-d");
+if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $fecha_actual)) $fecha_actual = date("Y-m-d");
 
 $cond_usuario = '';
 if ($tipo == 'USUARIO') {
@@ -27,8 +23,8 @@ $result = $obj->consultar("SELECT v.idventa, v.fecha_emision, v.total, dv.item, 
 FROM venta v
 INNER JOIN detalleventa dv ON v.idventa = dv.idventa
 INNER JOIN productos p ON dv.idproducto = p.idproducto
-WHERE v.fecha_emision BETWEEN '" . $obj->real_escape_string($desde) . "' AND '" . $obj->real_escape_string($hasta) . "' $cond_usuario AND v.estado != 'anulado'
-ORDER BY v.fecha_emision, v.idventa, dv.item");
+WHERE v.fecha_emision='" . $obj->real_escape_string($fecha_actual) . "' $cond_usuario AND v.estado != 'anulado'
+ORDER BY v.idventa, dv.item");
 
 $totalv = 0;
 foreach ((array)$result as $row) { $totalv += $row['importe_total']; }
@@ -37,29 +33,27 @@ foreach ((array)$result as $row) { $totalv += $row['importe_total']; }
 <html>
 <head>
 <meta charset="utf-8">
-<title>Reporte de Ventas</title>
+<title>Reporte Ventas del Día</title>
 </head>
 <body>
 <div class="page-container">
 <div class="main-content">
 <?php include('../central/cabecera.php');?>
 <hr/>
-<h2>Reporte de Ventas</h2>
+<h2>Reporte Ventas del Día</h2>
 <br/>
 <form method="get" action="" class="form-inline">
 <table class="table table-bordered">
 <tr>
-	<td><b>Desde</b></td>
-	<td><input type="date" name="desde" value="<?php echo htmlspecialchars($desde); ?>" class="form-control"/></td>
-	<td><b>Hasta</b></td>
-	<td><input type="date" name="hasta" value="<?php echo htmlspecialchars($hasta); ?>" class="form-control"/></td>
+	<td><b>Fecha</b></td>
+	<td><input type="date" name="fecha" value="<?php echo htmlspecialchars($fecha_actual); ?>" class="form-control"/></td>
 	<td><button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-search"></span> Ver reporte</button></td>
-	<td><a href="rptrango2venta.php?desde=<?php echo urlencode($desde); ?>&hasta=<?php echo urlencode($hasta); ?>" target="_blank" class="btn btn-info"><span class="glyphicon glyphicon-print"></span> Imprimir PDF</a></td>
+	<td><a href="rptventadia.php?fecha=<?php echo urlencode($fecha_actual); ?>" target="_blank" class="btn btn-info"><span class="glyphicon glyphicon-print"></span> Imprimir PDF</a></td>
 </tr>
 </table>
 </form>
 <br/>
-<p><strong>Período:</strong> <?php echo date('d/m/Y', strtotime($desde)); ?> – <?php echo date('d/m/Y', strtotime($hasta)); ?></p>
+<p><strong>Fecha:</strong> <?php echo date('d/m/Y', strtotime($fecha_actual)); ?></p>
 <div class="table-responsive" style="overflow-x: auto; max-width: 100%;">
 <table class="table table-bordered table-striped" style="width: 100%; max-width: 100%; table-layout: fixed;">
 <thead>
