@@ -1,0 +1,8 @@
+# Proteger archivos de configuración
+<FilesMatch "db_config\.php$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+# Prevenir listado de directorio
+Options -Indexes

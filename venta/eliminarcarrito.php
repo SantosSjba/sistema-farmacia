@@ -11,7 +11,10 @@ $usu=$_SESSION["usuario"];  ?>
 <?php
 include_once("../conexion/clsConexion.php");
 $obj= new clsConexion();
-$sql = "DELETE FROM carrito WHERE session_id='$usu' AND idproducto = '".$_POST["id"]."'";
+// Sanitizar entradas para prevenir SQL Injection
+$usu_safe = $obj->real_escape_string($usu);
+$id_safe = intval($_POST["id"]); // Solo aceptar enteros para IDs
+$sql = "DELETE FROM carrito WHERE session_id='".$usu_safe."' AND idproducto = '".$id_safe."'";
 $obj->ejecutar($sql);
  ?>
  </body>

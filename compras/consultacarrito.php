@@ -4,22 +4,24 @@ ob_start();
 $usu=$_SESSION["usuario"];
 include_once("../conexion/clsConexion.php");
 $obj=new clsConexion;
-$num=$result=$obj->consultar("SELECT * FROM carritoc WHERE session_id='$usu'");
+// Sanitizar variable de sesión para prevenir SQL Injection
+$usu_safe = $obj->real_escape_string($usu);
+$num=$result=$obj->consultar("SELECT * FROM carritoc WHERE session_id='".$usu_safe."'");
 $item = array();
 $index = 1;
 $data=$obj->consultar("SELECT impuesto FROM configuracion");
 		foreach($data as $row){
-			$impuesto=$row['impuesto'];
+			$impuesto=floatval($row['impuesto']);
 		}
-$data=$obj->consultar("SELECT ROUND(SUM(importe),2) as subtotal FROM carritoc WHERE session_id='$usu'");
+$data=$obj->consultar("SELECT ROUND(SUM(importe),2) as subtotal FROM carritoc WHERE session_id='".$usu_safe."'");
 		foreach($data as $row){
 			$subtotal=$row['subtotal'];
 		}
-$data=$obj->consultar("SELECT ROUND(SUM(importe)*$impuesto/100 ,2) as igv FROM carritoc WHERE session_id='$usu'");
+$data=$obj->consultar("SELECT ROUND(SUM(importe)*".$impuesto."/100 ,2) as igv FROM carritoc WHERE session_id='".$usu_safe."'");
 		foreach($data as $row){
 			$igv=$row['igv'];
 		}
-$data=$obj->consultar("SELECT ROUND(SUM(importe)*$impuesto/100+SUM(importe),2) as total FROM carritoc WHERE session_id='$usu'");
+$data=$obj->consultar("SELECT ROUND(SUM(importe)*".$impuesto."/100+SUM(importe),2) as total FROM carritoc WHERE session_id='".$usu_safe."'");
 		foreach($data as $row){
 			$total=$row['total'];
 		}
@@ -50,12 +52,12 @@ $item[$index] = $row;
 ?>
 				<tr>
 					  <td><?php echo $index++;?></td>
-						<td><?php echo $row["descripcion"];?></td>
-						<td><?php echo $row["presentacion"];?></td>
-					  <td contenteditable class="cantidad" id="cantidad" id2="<?php echo $row["idproducto"];?>"><?php echo $c=$row["cantidad"];?></td>
-						<td contenteditable class="precio" id="precio" id1="<?php echo $row["idproducto"];?>"><?php echo $p=$row["precio"];?></td>
-						<td><?php $im=$c*$p;echo number_format($im,2);?></td>
-						<td><button type="button" name="delete_btn" data-id3="<?php echo $row["idproducto"];?>" class="btn btn-xs btn-danger btn_delete"><span class='glyphicon glyphicon-minus'></span></button></td>
+						<td><?php echo htmlspecialchars($row["descripcion"], ENT_QUOTES, 'UTF-8');?></td>
+						<td><?php echo htmlspecialchars($row["presentacion"], ENT_QUOTES, 'UTF-8');?></td>
+					  <td contenteditable class="cantidad" id="cantidad" id2="<?php echo intval($row["idproducto"]);?>"><?php echo $c=floatval($row["cantidad"]);?></td>
+						<td contenteditable class="precio" id="precio" id1="<?php echo intval($row["idproducto"]);?>"><?php echo $p=number_format($row["precio"],2);?></td>
+						<td><?php $im=$c*floatval($row["precio"]);echo number_format($im,2);?></td>
+						<td><button type="button" name="delete_btn" data-id3="<?php echo intval($row["idproducto"]);?>" class="btn btn-xs btn-danger btn_delete"><span class='glyphicon glyphicon-minus'></span></button></td>
 				</tr>
 <?php
 };

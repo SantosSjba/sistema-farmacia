@@ -6,13 +6,13 @@ include("../conexion/clsConexion.php");
 	  $result=$objcliente->consultar("select * from cliente WHERE nombres <> 'publico en general'");
 		$data= Array();
 	foreach ((array)$result as $row) {
-
+		// Sanitizar salida para prevenir XSS
 		$data[]=array(
-			"0"=>$row['nombres'],
-			"1"=>$row['direccion'],
-			"2"=>$row['nrodoc'],
-      "3"=>'<a href="actualizar.php?idcliente='.$row["idcliente"].'" class="btn btn-info btn-xs">Editar</a>',
-			"4"=>'<button type="button" name="delete" id="'.$row["idcliente"].'" class="btn btn-danger btn-xs delete">Eliminar</button>',
+			"0"=>htmlspecialchars($row['nombres'], ENT_QUOTES, 'UTF-8'),
+			"1"=>htmlspecialchars($row['direccion'], ENT_QUOTES, 'UTF-8'),
+			"2"=>htmlspecialchars($row['nrodoc'], ENT_QUOTES, 'UTF-8'),
+			"3"=>'<a href="actualizar.php?idcliente='.intval($row["idcliente"]).'" class="btn btn-info btn-xs">Editar</a>',
+			"4"=>'<button type="button" name="delete" id="'.intval($row["idcliente"]).'" class="btn btn-danger btn-xs delete">Eliminar</button>',
 			);
 	}
 	$results = array(

@@ -5,12 +5,16 @@ $usu=$_SESSION["usuario"];
 if (isset($_GET['term'])){
 	# conectare la base de datos
 	include_once("../conexion/clsConexion.php");
-  $obj=new clsConexion;
-  $return_arr = array();
+	$obj=new clsConexion;
+	
+	// Sanitizar entrada para prevenir SQL Injection
+	$term = $obj->real_escape_string(trim($_GET['term']));
+	
+	$return_arr = array();
 	$data=$obj->consultar("SELECT sintoma.sintoma, productos.*, lote.numero, presentacion.presentacion
 	FROM productos INNER JOIN sintoma ON productos.idsintoma = sintoma.idsintoma
 	INNER JOIN lote ON productos.idlote = lote.idlote INNER JOIN presentacion
-	ON productos.idpresentacion = presentacion.idpresentacion  WHERE  descripcion like '%" .($_GET['term']) . "%' ");
+	ON productos.idpresentacion = presentacion.idpresentacion WHERE descripcion LIKE '%".$term."%' ");
 
 	foreach($data as $row) {
 		$id_producto=$row['idproducto'];

@@ -1,10 +1,15 @@
 <?php
-//include("../seguridad.php");
-//$usu=$_SESSION["usuario"];
+// IMPORTANTE: Seguridad habilitada para prevenir acceso no autorizado
+include("../seguridad.php");
+$usu=$_SESSION["usuario"];
 include_once("ventasunat.php");
 include_once("../conexion/clsConexion.php");
 $obj= new clsConexion();
-$num=$data=$obj->consultar("SELECT * FROM carrito WHERE session_id='$usu'");
+
+// Sanitizar usuario
+$usu_safe = $obj->real_escape_string($usu);
+$data=$obj->consultar("SELECT * FROM carrito WHERE session_id='".$usu_safe."'");
+$num = is_array($data) ? count($data) : 0;
 $tire=$obj->real_escape_string($_POST['tire']);
 $tico=$obj->real_escape_string($_POST['tico']);
 $serie_p=$obj->real_escape_string($_POST['serie']);

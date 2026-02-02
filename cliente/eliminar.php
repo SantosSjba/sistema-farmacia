@@ -1,4 +1,6 @@
 <?php
+// Verificación de seguridad
+include("../seguridad.php");
 require "../conexion/clsConexion.php";
 $obj= new clsConexion();
 $cod= trim($obj->real_escape_string(htmlentities(strip_tags($_POST['id'],ENT_QUOTES))));

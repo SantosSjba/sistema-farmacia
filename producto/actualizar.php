@@ -53,7 +53,7 @@ $data=$objproductos->consultar("SELECT * FROM productos WHERE idproducto='".$obj
 				<form role="form" name="miformulario" action="capturar.php" method="post" >
 					<div class="col-md-6 form-group">
 							<label><strong>Codigo de Barra:</strong></label>
-							<input type="text" class="form-control"  placeholder="ingrese codigo de barra" name="txtcb" id="txtcb" value="<?php echo $cb;?>">
+							<input type="text" class="form-control"  placeholder="ingrese codigo de barra" name="txtcb" id="txtcb" value="<?php echo htmlspecialchars($cb, ENT_QUOTES, 'UTF-8');?>">
 					</div>
 
 				<div class="col-md-6 form-group">
@@ -74,7 +74,7 @@ $data=$objproductos->consultar("SELECT * FROM productos WHERE idproducto='".$obj
 
 					<div class="col-md-6 form-group">
 							<label><strong>Descripcion(*)</strong></label>
-					<input type="text" class="form-control" required  placeholder="ingrese su descripcion" name="txtde" value="<?php echo $n;?>">
+					<input type="text" class="form-control" required  placeholder="ingrese su descripcion" name="txtde" value="<?php echo htmlspecialchars($n, ENT_QUOTES, 'UTF-8');?>">
 					</div>
 
 				<div class="col-md-6 form-group">
@@ -88,20 +88,20 @@ $data=$objproductos->consultar("SELECT * FROM productos WHERE idproducto='".$obj
 
 					<div class="col-md-6 form-group">
 							<label><strong>Stock(*)</strong></label>
-						<input type="text"   name="txtst"class="form-control" required  placeholder="ingrese el stock" value="<?php echo $stock;?>" >
+						<input type="number"   name="txtst"class="form-control" required  placeholder="ingrese el stock" value="<?php echo intval($stock);?>" min="0">
 					</div>
 
 					<div class="col-md-6 form-group">
 							<label><strong>stock minimo(*)</strong></label>
-						<input type="text"   name="txtstm"class="form-control" required  placeholder="ingrese el stock minimo" value="<?php echo $stockmin;?>">
+						<input type="number"   name="txtstm"class="form-control" required  placeholder="ingrese el stock minimo" value="<?php echo intval($stockmin);?>" min="0">
 					</div>
 					<div class="col-md-6 form-group">
 							<label><strong>precio compra(*)</strong></label>
-						<input type="text"   name="txtpc"class="form-control" required  placeholder="ingrese el precio compra" value="<?php echo $pc;?>">
+						<input type="number" step="0.01" name="txtpc"class="form-control" required  placeholder="ingrese el precio compra" value="<?php echo number_format(floatval($pc), 2, '.', '');?>" min="0">
 					</div>
 					<div class="col-md-6 form-group">
 							<label><strong>precio venta(*)</strong></label>
-						<input type="text"   name="txtpv"class="form-control"required  placeholder="ingrese el precio venta" value="<?php echo $pv;?>">
+						<input type="number" step="0.01" name="txtpv"class="form-control"required  placeholder="ingrese el precio venta" value="<?php echo number_format(floatval($pv), 2, '.', '');?>" min="0">
 					</div>
 					<!-- <div class="col-md-6 form-group">
 							<label><strong>Descuento</strong></label>
@@ -121,7 +121,7 @@ $data=$objproductos->consultar("SELECT * FROM productos WHERE idproducto='".$obj
 					</div>
 					<div class="col-md-6 form-group">
 							<label><strong>Registro Sanitario</strong></label>
-						<input type="text"   name="txtrs"class="form-control"  placeholder="ingrese el registro sanitario" value="<?php echo $rs;?>">
+						<input type="text"   name="txtrs"class="form-control"  placeholder="ingrese el registro sanitario" value="<?php echo htmlspecialchars($rs, ENT_QUOTES, 'UTF-8');?>">
 					</div>
 				<div class="col-md-6 form-group">
 						<label><strong>Forma Farmaceutica</strong></label>
@@ -196,12 +196,12 @@ $data=$objproductos->consultar("SELECT * FROM productos WHERE idproducto='".$obj
 						<label>Tipo Afectacion(*)</label>
 						<select name="tafec" class='form-control'required>
 							<?php
-																	$result=$obj->consultar("select * from tipo_afectacion");
+																	$result=$objproductos->consultar("select * from tipo_afectacion");
 																	foreach((array)$result as $row){
 																	if($row['idtipoa']==$tafec){
-																		echo '<option value="'.$row['idtipoa'].'" selected>'.$row['descripcion'].'</option>';
+																		echo '<option value="'.htmlspecialchars($row['idtipoa'], ENT_QUOTES, 'UTF-8').'" selected>'.htmlspecialchars($row['descripcion'], ENT_QUOTES, 'UTF-8').'</option>';
 																	}else{
-																		echo '<option value="'.$row['idtipoa'].'">'.$row['descripcion'].'</option>';
+																		echo '<option value="'.htmlspecialchars($row['idtipoa'], ENT_QUOTES, 'UTF-8').'">'.htmlspecialchars($row['descripcion'], ENT_QUOTES, 'UTF-8').'</option>';
 																	}
 																}
 								?>
