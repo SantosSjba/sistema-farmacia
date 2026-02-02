@@ -46,11 +46,11 @@ function EXPORT_TABLES($host, $user, $pass, $name, $tables = false, $backup_name
                 }
                 $content .= "\n(";
                 for ($j = 0; $j < $fields_amount; $j++) {
-                    $row[$j] = str_replace("\n", "\\n", addslashes($row[$j]));
-                    if (isset($row[$j])) {
-                        $content .= '"' . $row[$j] . '"';
+                    if ($row[$j] === null) {
+                        $content .= 'NULL';
                     } else {
-                        $content .= '""';
+                        $escaped = str_replace("\n", "\\n", addslashes($row[$j]));
+                        $content .= '"' . $escaped . '"';
                     }
                     if ($j < ($fields_amount - 1)) {
                         $content .= ',';
