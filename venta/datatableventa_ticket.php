@@ -52,7 +52,7 @@ foreach ((array)$result_valida as $row) {
         "2" => $row['serie'],
         "3" => $row['correlativo'],
         "4" => $row['feestado'] === 'anulado' ? '<span class="badge badge-danger">Anulado</span>' : '',
-        "5"=>'<button type="button" name="anular" id="'.$row["idventa"].'" class="btn btn-default btn-xs anular">Anular</button>',
+        "5" => $row['feestado'] === 'anulado' ? '<button type="button" class="btn btn-default btn-xs" disabled>Anulado</button>' : '<button type="button" name="anular" id="'.$row["idventa"].'" class="btn btn-default btn-xs anular">Anular</button>',
         "6" => $btn_imprimir,
         "7" => $btn_imprimir2,
     );
