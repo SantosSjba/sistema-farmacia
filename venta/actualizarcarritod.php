@@ -3,6 +3,7 @@ include("../seguridad.php");
 ob_start();
 $usu=$_SESSION["usuario"];
 include_once("../conexion/clsConexion.php");
+include_once("../redondeo_venta.php");
 $obj= new clsConexion();
 $descuento= trim($obj->real_escape_string(htmlentities(strip_tags($_POST['descuento'],ENT_QUOTES))));
 $id= trim($obj->real_escape_string(htmlentities(strip_tags($_POST['id'],ENT_QUOTES))));
@@ -26,17 +27,16 @@ $text= trim($obj->real_escape_string(htmlentities(strip_tags($_POST['text'],ENT_
 		 // echo 'actualizado';
 
      if ($ope=='OP. GRAVADAS') {
-      $v_t= $cantidad*$v_u-$text;
-      $v_t= $v_u*$text;
-      $igv=number_format(($impuesto/100)*$v_t,2);
-      $imp=$igv+$v_t;
+      $v_t = redondear_abajo_10centimos($v_u * $cantidad);
+      $igv = redondear_abajo_10centimos(($impuesto/100) * $v_t);
+      $imp = redondear_abajo_10centimos($igv + $v_t);
 
       $sql = "UPDATE carrito SET ".$descuento."=".$text.",valor_total=".$v_t.",importe_total=".$imp.",igv=".$igv."  WHERE session_id='$usu' AND idproducto='".$id."'";
       $obj->ejecutar($sql);
       echo 'ACTUALIZADO';
 
      }else {
-     $imp= $cantidad*$v_u-$text;
+     $imp = redondear_abajo_10centimos($cantidad * $v_u);
      $sql = "UPDATE carrito SET ".$descuento."=".$text.",valor_total=".$imp." ,importe_total=".$imp." WHERE session_id='$usu' AND idproducto='".$id."'";
      $obj->ejecutar($sql);
      echo 'ACTUALIZADO';

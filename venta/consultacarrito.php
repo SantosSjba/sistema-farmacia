@@ -3,6 +3,7 @@ include("../seguridad.php");
 ob_start();
 $usu=$_SESSION["usuario"];
 include_once("../conexion/clsConexion.php");
+include_once("../redondeo_venta.php");
 $obj=new clsConexion;
 // Sanitizar variable de sesión para prevenir SQL Injection
 $usu_safe = $obj->real_escape_string($usu);
@@ -41,11 +42,11 @@ $item[$index] = $row;
 						<td><?php echo htmlspecialchars($row["descripcion"], ENT_QUOTES, 'UTF-8');?></td>
 						<td><?php echo htmlspecialchars($row["presentacion"], ENT_QUOTES, 'UTF-8');?></td>
 					  <td contenteditable class="cantidad" id="cantidad" id2="<?php echo intval($row["idproducto"]);?>"><?php echo $c=floatval($row["cantidad"]);?></td>
-						<td><?php echo number_format($row["valor_unitario"], 2);?></td>
-						<td contenteditable class="precio_unitario" id="precio_unitario" id1="<?php echo intval($row["idproducto"]);?>"><?php echo number_format($row["precio_unitario"], 2);?></td>
+						<td><?php echo number_format(redondear_abajo_10centimos($row["valor_unitario"]), 2, '.', '');?></td>
+						<td contenteditable class="precio_unitario" id="precio_unitario" id1="<?php echo intval($row["idproducto"]);?>"><?php echo number_format(redondear_abajo_10centimos($row["precio_unitario"]), 2, '.', '');?></td>
 
 						<!-- <td><?php echo $row["precio_unitario"];?></td> -->
-						<td><?php echo number_format($row["importe_total"],2);?></td>
+						<td><?php echo number_format(redondear_abajo_10centimos($row["importe_total"]), 2, '.', '');?></td>
 						<td><button type="button" name="delete_btn" data-id3="<?php echo intval($row["idproducto"]);?>" class="btn btn-xs btn-danger btn_delete"><span class='glyphicon glyphicon-minus'></span></button></td>
 
 				</tr>

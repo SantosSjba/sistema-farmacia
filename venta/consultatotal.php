@@ -3,6 +3,7 @@ include("../seguridad.php");
 ob_start();
 $usu=$_SESSION["usuario"];
 include_once("../conexion/clsConexion.php");
+include_once("../redondeo_venta.php");
 $obj=new clsConexion;
 $total=0;
 $igv=0;
@@ -15,24 +16,24 @@ $data=$obj->consultar("SELECT impuesto FROM configuracion");
 				foreach((array)$data as $row){
 					if($row['igv']==null){
 						$igv=0;
-					}else{
+						}else{
 						$igv=$row['igv'];
 					}
 				}
 
-		$data=$obj->consultar("SELECT ROUND(SUM(valor_total)+	$igv,2) as total FROM carrito  WHERE session_id='$usu'");
+		$data=$obj->consultar("SELECT (SUM(valor_total)+$igv) as total FROM carrito WHERE session_id='$usu'");
 						foreach((array)$data as $row){
 								$total=$row['total'];
 					}
+		$total = $total !== null ? redondear_abajo_10centimos($total) : 0;
+		$igv = $igv !== null ? redondear_abajo_10centimos($igv) : 0;
 ?>
 <h1 align="center">
 <?php
-if($total==null){
+if ((float)$total == 0) {
 	echo "S/ 0.00";
-}else{
-	//$o= round($total);
-	//echo sprintf("%2.2f",$o);
-	echo "$total";
+} else {
+	echo number_format((float)$total, 2, '.', '');
 }
 ?>
 </h1>

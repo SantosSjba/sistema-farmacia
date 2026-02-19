@@ -2,6 +2,7 @@
 include("../seguridad.php");
 $usu=$_SESSION["usuario"];
 include_once("../conexion/clsConexion.php");
+include_once("../redondeo_venta.php");
 $obj= new clsConexion();
 
 // Sanitizar usuario de sesión
@@ -75,6 +76,11 @@ if($num == 0) {
 		foreach((array)$data5 as $row){
 			$total = floatval($row['total']);
 		}
+		$op_gravadas = redondear_abajo_10centimos($op_gravadas);
+		$op_exoneradas = redondear_abajo_10centimos($op_exoneradas);
+		$op_inafectas = redondear_abajo_10centimos($op_inafectas);
+		$igv = redondear_abajo_10centimos($igv);
+		$total = redondear_abajo_10centimos($total);
 		// Obtener el último id de venta de forma segura
 		$idventa = 11; // Valor inicial por defecto
 		$data_j=$obj->consultar("SELECT MAX(idventa) as idventa FROM venta FOR UPDATE");

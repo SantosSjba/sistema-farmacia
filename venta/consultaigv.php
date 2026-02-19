@@ -3,6 +3,7 @@ include("../seguridad.php");
 ob_start();
 $usu=$_SESSION["usuario"];
 include_once("../conexion/clsConexion.php");
+include_once("../redondeo_venta.php");
 $obj=new clsConexion;
 //declarar variables
 $op_gravadas = 0;
@@ -45,29 +46,34 @@ $impuesto='';
 										foreach((array)$data5 as $row){
 											$total=$row['total'];
 										 }
+		$op_gravadas = $op_gravadas !== null ? redondear_abajo_10centimos($op_gravadas) : 0;
+		$op_exoneradas = $op_exoneradas !== null ? redondear_abajo_10centimos($op_exoneradas) : 0;
+		$op_inafectas = $op_inafectas !== null ? redondear_abajo_10centimos($op_inafectas) : 0;
+		$igv = $igv !== null ? redondear_abajo_10centimos($igv) : 0;
+		$total = $total !== null ? redondear_abajo_10centimos($total) : 0;
 ?>
 <div class="center">
 	<table class="table table-striped">
 	  <tr>
 	    <td width="98">OP. GRAVADAS:</td>
-	    <td width="52"><?php if($op_gravadas==null){ echo '0.00';}else{echo "$mon".' '."$op_gravadas";}?></td>
+	    <td width="52"><?php echo $mon.' '.number_format($op_gravadas, 2, '.', ''); ?></td>
   </tr>
 	<tr>
 		<td width="98">IGV:</td>
-		<td width="52"><?php if($igv==null){ echo '0.00'; }else{ echo "$mon".' '."$igv";}?></td>
+		<td width="52"><?php echo $mon.' '.number_format($igv, 2, '.', ''); ?></td>
 	</tr>
 	<tr>
 		<td width="98">OP. EXONERADAS:</td>
-		<td width="52"><?php if($op_exoneradas==null){ echo '0.00'; }else{ echo "$mon".' '."$op_exoneradas";}?></td>
+		<td width="52"><?php echo $mon.' '.number_format($op_exoneradas, 2, '.', ''); ?></td>
 	</tr>
 	<tr>
 		<td width="98">OP. INAFECTAS:</td>
-		<td width="52"><?php if($op_inafectas==null){ echo '0.00'; }else{ echo "$mon".' '."$op_inafectas";}?></td>
+		<td width="52"><?php echo $mon.' '.number_format($op_inafectas, 2, '.', ''); ?></td>
 	</tr>
 <tr>
 	<td width="110"><label>IMPORTE TOTAL:</label></td>
-	<td width="80"><?php  if($total==null){ echo '0.00';}else{echo "$mon".' '."$total";}?>
-		 <input type="hidden" id="total" name="total" value="<?php echo $total;?>"/>
+	<td width="80"><?php echo $mon.' '.number_format($total, 2, '.', ''); ?>
+		 <input type="hidden" id="total" name="total" value="<?php echo number_format($total, 2, '.', ''); ?>"/>
 	</td>
 </tr>
 	</table>

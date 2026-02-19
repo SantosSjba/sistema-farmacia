@@ -3,6 +3,7 @@ include("../seguridad.php");
 ob_start();
 $usu=$_SESSION["usuario"];
 include_once("../conexion/clsConexion.php");
+include_once("../redondeo_venta.php");
 $obj= new clsConexion();
 $idpc=NULL;
 $imps=$obj->consultar("SELECT impuesto FROM configuracion");
@@ -48,41 +49,32 @@ if ($idproducto==$idpc) {
   echo 'El Producto Ya Fue Agregado Al Carrito';
 }else {
       if ($ope=='OP. GRAVADAS') {
-        $pu_g=number_format($v_u/(1+($impuesto/100)),2);
-        //$imp_g=number_format($v_u-$op_g,2);
-        //$tot_g=number_format($imp_g+$op_g,2);
-        $imp_t=number_format($cant*$v_u,2);
-         //referente
-        $p_u=number_format(($impuesto/100*$pu_g)+$pu_g,2);
-        //$p_u=number_format(($impuesto/100*$v_u)+$v_u,2);
-        //  $igv=number_format(($impuesto/100)*$v_t,2);
-        $igv_g=number_format(($impuesto/100)*$pu_g,2);
-        $v_t=number_format($cant*$pu_g,2);
-        //$imp=number_format($igv+$v_t,2);
+        // Precio que paga el cliente = precio_venta (evita que 2 soles se convierta en 1.99)
+        $p_u = redondear_abajo_10centimos($v_u);
+        // Base imponible (valor unitario sin IGV)
+        $pu_g = redondear_abajo_10centimos($v_u / (1 + ($impuesto/100)));
+        $igv_g = redondear_abajo_10centimos(($impuesto/100) * $pu_g);
+        $v_t = redondear_abajo_10centimos($cant * $pu_g);
+        $imp_t = redondear_abajo_10centimos($cant * $p_u);
         $sql="INSERT INTO `carrito`(`idproducto`, `descripcion`,`presentacion`, `cantidad`, `valor_unitario`, `precio_unitario`, `igv`, `porcentaje_igv`, `valor_total`, `importe_total`, `operacion`, `session_id`)
                             VALUES ('$idproducto','$des','$prese','$cant','$pu_g','$p_u','$igv_g','$impuesto','$v_t','$imp_t','$ope','$usu')";
         $obj->ejecutar($sql);
         echo 'Producto Agregado Al Carrito';
 
       }elseif ($ope=='OP. EXONERADAS') {
-        //el porentaje del igv es igual al impuesto 18.00
-        //en este caso el valor unitario es igual al precio de venta del producto
-        $p_u=$v_u;
-        // en este caso el igv es 0
-        $igv=0.00;
-        //el valor total es igual a la cantidad  x el valor unitrio
-        $v_t=number_format($cant*$v_u,2);
-        // en este caso el importe total es igual al valor total
-        $imp=$v_t;
+        $p_u = redondear_abajo_10centimos($v_u);
+        $igv = 0.00;
+        $v_t = redondear_abajo_10centimos($cant * $v_u);
+        $imp = $v_t;
         $sql="INSERT INTO `carrito`(`idproducto`, `descripcion`,`presentacion`, `cantidad`, `valor_unitario`, `precio_unitario`, `igv`, `porcentaje_igv`, `valor_total`, `importe_total`, `operacion`, `session_id`)
                             VALUES ('$idproducto','$des','$prese','$cant','$v_u','$p_u','$igv','$impuesto','$v_t','$imp','$ope','$usu')";
         $obj->ejecutar($sql);
         echo 'Producto Agregado Al Carrito';
       }elseif ($ope=='OP. INAFECTAS') {
-        $p_u=$v_u;
-        $igv=0.00;
-        $v_t=number_format($cant*$v_u,2);
-        $imp=$v_t;
+        $p_u = redondear_abajo_10centimos($v_u);
+        $igv = 0.00;
+        $v_t = redondear_abajo_10centimos($cant * $v_u);
+        $imp = $v_t;
         $sql="INSERT INTO `carrito`(`idproducto`, `descripcion`, `presentacion`,`cantidad`, `valor_unitario`, `precio_unitario`, `igv`, `porcentaje_igv`, `valor_total`, `importe_total`, `operacion`, `session_id`)
                             VALUES ('$idproducto','$des','$prese','$cant','$v_u','$p_u','$igv','$impuesto','$v_t','$imp','$ope','$usu')";
         $obj->ejecutar($sql);
