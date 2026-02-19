@@ -127,7 +127,7 @@ function regresa()
 <div class="zona_impresion">
 <table  border="0" class="zona_impresion">
   <tr>
-    <td colspan="2" align="center"><img src="../configuracion/foto/<?php echo $logo?>" width="210" height="50" /></td>
+    <td colspan="2" align="center"><img src="../configuracion/foto/<?php echo $logo?>" width="120" height="120" style="object-fit: contain;" /></td>
   </tr>
   <tr>
     <td colspan="2" align="center"><?php echo "$razon".'-  '."RUC".'  :'."$ruc_num";?></td>
