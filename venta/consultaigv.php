@@ -3,7 +3,6 @@ include("../seguridad.php");
 ob_start();
 $usu=$_SESSION["usuario"];
 include_once("../conexion/clsConexion.php");
-include_once("../redondeo_venta.php");
 $obj=new clsConexion;
 //declarar variables
 $op_gravadas = 0;
@@ -42,15 +41,15 @@ $impuesto='';
 											}
 
 										}
-								$data5=$obj->consultar("SELECT ROUND(SUM(valor_total)+$igv,2) as total FROM carrito WHERE session_id='$usu'");
+								$data5=$obj->consultar("SELECT COALESCE(SUM(importe_total), 0) as total FROM carrito WHERE session_id='$usu'");
 										foreach((array)$data5 as $row){
 											$total=$row['total'];
 										 }
-		$op_gravadas = $op_gravadas !== null ? redondear_abajo_10centimos($op_gravadas) : 0;
-		$op_exoneradas = $op_exoneradas !== null ? redondear_abajo_10centimos($op_exoneradas) : 0;
-		$op_inafectas = $op_inafectas !== null ? redondear_abajo_10centimos($op_inafectas) : 0;
-		$igv = $igv !== null ? redondear_abajo_10centimos($igv) : 0;
-		$total = $total !== null ? redondear_abajo_10centimos($total) : 0;
+		$op_gravadas = $op_gravadas !== null ? round((float)$op_gravadas, 2) : 0;
+		$op_exoneradas = $op_exoneradas !== null ? round((float)$op_exoneradas, 2) : 0;
+		$op_inafectas = $op_inafectas !== null ? round((float)$op_inafectas, 2) : 0;
+		$igv = $igv !== null ? round((float)$igv, 2) : 0;
+		$total = $total !== null ? round((float)$total, 2) : 0;
 ?>
 <div class="center">
 	<table class="table table-striped">

@@ -4,7 +4,6 @@ include("../seguridad.php");
 $usu=$_SESSION["usuario"];
 include_once("ventasunat.php");
 include_once("../conexion/clsConexion.php");
-include_once("../redondeo_venta.php");
 $obj= new clsConexion();
 
 // Sanitizar usuario
@@ -69,11 +68,11 @@ if($num == 0) {
 											foreach((array)$data5 as $row){
 												$total=$row['total'];
 											 }
-		$op_gravadas = redondear_abajo_10centimos($op_gravadas);
-		$op_exoneradas = redondear_abajo_10centimos($op_exoneradas);
-		$op_inafectas = redondear_abajo_10centimos($op_inafectas);
-		$igv = redondear_abajo_10centimos($igv);
-		$total = redondear_abajo_10centimos($total);
+		$op_gravadas = round((float)$op_gravadas, 2);
+		$op_exoneradas = round((float)$op_exoneradas, 2);
+		$op_inafectas = round((float)$op_inafectas, 2);
+		$igv = round((float)$igv, 2);
+		$total = round((float)$total, 2);
 	//obtener el ultimo id de venta
 $data_j=$obj->consultar("SELECT MAX(idventa) as idventa FROM venta");
 		foreach($data_j as $row){

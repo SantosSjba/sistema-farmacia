@@ -3,7 +3,6 @@ include("../seguridad.php");
 ob_start();
 $usu=$_SESSION["usuario"];
 include_once("../conexion/clsConexion.php");
-include_once("../redondeo_venta.php");
 $obj= new clsConexion();
 $idpc=NULL;
 $imps=$obj->consultar("SELECT impuesto FROM configuracion");
@@ -39,29 +38,29 @@ if ($idproducto==$idpc) {
   echo 'El Producto Ya Fue Agregado Al Carrito';
 }else {
   if ($ope=='OP. GRAVADAS') {
-    $p_u = redondear_abajo_10centimos($v_u);
-    $pu_g = redondear_abajo_10centimos($v_u / (1 + ($impuesto/100)));
-    $igv_g = redondear_abajo_10centimos(($impuesto/100) * $pu_g);
-    $v_t = redondear_abajo_10centimos($cant * $pu_g);
-    $imp_t = redondear_abajo_10centimos($cant * $p_u);
+    $p_u = round((float)$v_u, 2);
+    $pu_g = round((float)$v_u / (1 + ($impuesto/100)), 6);
+    $igv_g = round(($impuesto/100) * $pu_g * $cant, 2);
+    $v_t = round($pu_g * $cant, 6);
+    $imp_t = round($p_u * $cant, 2);
     $sql="INSERT INTO `carrito`(`idproducto`, `descripcion`,`presentacion`, `cantidad`, `valor_unitario`, `precio_unitario`, `igv`, `porcentaje_igv`, `valor_total`, `importe_total`, `operacion`, `session_id`)
                         VALUES ('$idproducto','$des','$prese','$cant','$pu_g','$p_u','$igv_g','$impuesto','$v_t','$imp_t','$ope','$usu')";
     $obj->ejecutar($sql);
     echo 'Producto Agregado Al Carrito';
 
   }elseif ($ope=='OP. EXONERADAS') {
-    $p_u = redondear_abajo_10centimos($v_u);
+    $p_u = round((float)$v_u, 2);
     $igv = 0.00;
-    $v_t = redondear_abajo_10centimos($cant * $v_u);
+    $v_t = round((float)$v_u * $cant, 2);
     $imp = $v_t;
     $sql="INSERT INTO `carrito`(`idproducto`, `descripcion`,`presentacion`, `cantidad`, `valor_unitario`, `precio_unitario`, `igv`, `porcentaje_igv`, `valor_total`, `importe_total`, `operacion`, `session_id`)
                         VALUES ('$idproducto','$des','$prese','$cant','$v_u','$p_u','$igv','$impuesto','$v_t','$imp','$ope','$usu')";
     $obj->ejecutar($sql);
     echo 'Producto Agregado Al Carrito';
   }elseif ($ope=='OP. INAFECTAS') {
-    $p_u = redondear_abajo_10centimos($v_u);
+    $p_u = round((float)$v_u, 2);
     $igv = 0.00;
-    $v_t = redondear_abajo_10centimos($cant * $v_u);
+    $v_t = round((float)$v_u * $cant, 2);
     $imp = $v_t;
     $sql="INSERT INTO `carrito`(`idproducto`, `descripcion`, `presentacion`,`cantidad`, `valor_unitario`, `precio_unitario`, `igv`, `porcentaje_igv`, `valor_total`, `importe_total`, `operacion`, `session_id`)
                         VALUES ('$idproducto','$des','$prese','$cant','$v_u','$p_u','$igv','$impuesto','$v_t','$imp','$ope','$usu')";

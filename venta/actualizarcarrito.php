@@ -3,7 +3,6 @@ include("../seguridad.php");
 ob_start();
 $usu=$_SESSION["usuario"];
 include_once("../conexion/clsConexion.php");
-include_once("../redondeo_venta.php");
 $obj= new clsConexion();
 
 // Sanitizar entradas
@@ -44,17 +43,17 @@ if($text > $stock){
     echo 'NO CUENTA CON EL STOCK SUFICIENTE';
 }else{
     if ($ope=='OP. GRAVADAS') {
-        $pu_g = redondear_abajo_10centimos($pu_c / (1 + ($impuesto/100)));
-        $v_t = redondear_abajo_10centimos($pu_g * $text);
-        $imp = redondear_abajo_10centimos($text * $pu_c);
-        $igv = redondear_abajo_10centimos(($impuesto/100) * $pu_g * $text);
+        $pu_g = round((float)$pu_c / (1 + ($impuesto/100)), 6);
+        $v_t = round($pu_g * $text, 6);
+        $imp = round($text * $pu_c, 2);
+        $igv = round(($impuesto/100) * $pu_g * $text, 2);
 
         $sql = "UPDATE carrito SET ".$cantidad."=".$text.",valor_total=".$v_t.",importe_total=".$imp.",igv=".$igv."
         WHERE session_id='".$usu_safe."' AND idproducto='".$id."'";
         $obj->ejecutar($sql);
         echo 'ACTUALIZADO';
     } else {
-        $imp = redondear_abajo_10centimos($pu_c * $text);
+        $imp = round($pu_c * $text, 2);
         $sql = "UPDATE carrito SET ".$cantidad."=".$text.",valor_total=".$imp.",importe_total=".$imp." WHERE session_id='".$usu_safe."' AND idproducto='".$id."'";
         $obj->ejecutar($sql);
         echo 'ACTUALIZADO';
