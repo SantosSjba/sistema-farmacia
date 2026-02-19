@@ -23,7 +23,7 @@ if ($tipo == 'USUARIO') {
     }
 }
 
-$result = $obj->consultar("SELECT v.idventa, v.fecha_emision, v.total, dv.item, dv.cantidad, dv.valor_unitario, dv.importe_total, p.descripcion as producto
+$result = $obj->consultar("SELECT v.idventa, v.fecha_emision, v.total, dv.item, dv.cantidad, dv.precio_unitario, dv.valor_unitario, dv.importe_total, p.descripcion as producto
 FROM venta v
 INNER JOIN detalleventa dv ON v.idventa = dv.idventa
 INNER JOIN productos p ON dv.idproducto = p.idproducto
@@ -83,7 +83,7 @@ foreach ((array)$result as $row) {
 	<td style="overflow: hidden; text-overflow: ellipsis;"><?php echo $row['fecha_emision']; ?></td>
 	<td style="overflow: hidden; text-overflow: ellipsis;" title="<?php echo htmlspecialchars($row['producto']); ?>"><?php echo htmlspecialchars($row['producto']); ?></td>
 	<td><?php echo $row['cantidad']; ?></td>
-	<td><?php echo number_format($row['valor_unitario'], 2); ?></td>
+	<td><?php echo number_format(isset($row['precio_unitario']) ? (float)$row['precio_unitario'] : $row['valor_unitario'], 2); ?></td>
 	<td><?php echo number_format($row['importe_total'], 2); ?></td>
 	<td><?php echo $totalventa_td; ?></td>
 </tr>

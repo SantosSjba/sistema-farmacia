@@ -127,21 +127,21 @@ function imprimir() {
             <td width="268"><?php echo "CONTADO"; ?></td>
         </tr>
     </table>
-    <table border="0" width="300px" align="center" class="zona_impresion">
+    <table border="0" width="400px" align="center" class="zona_impresion">
         <br>
         <tr>
-            <td width="49"><b>ITEM</b></td>
-            <td width="219"><b>CANTIDAD</b></td>
-            <td width="49"><b>PRODUCTO</b></td>
-            <td width="49"><b>P.U.</b></td>
-            <td width="68" align="right"><b>SUBTOTAL</b></td>
+            <td width="35"><b>ITEM</b></td>
+            <td width="45"><b>CANT.</b></td>
+            <td width="180"><b>PRODUCTO</b></td>
+            <td width="55"><b>P.U.</b></td>
+            <td width="65" align="right"><b>SUBTOTAL</b></td>
         </tr>
         <tr>
             <td colspan="5">=======================================================</td>
         </tr>
         <?php
         $datadet = $obj->consultar("SELECT detalleventa.item, detalleventa.cantidad, productos.descripcion,
-            detalleventa.valor_unitario, detalleventa.valor_total, detalleventa.importe_total, detalleventa.idventa,
+            detalleventa.precio_unitario, detalleventa.valor_unitario, detalleventa.valor_total, detalleventa.importe_total, detalleventa.idventa,
             presentacion.presentacion
             FROM detalleventa
             INNER JOIN productos ON detalleventa.idproducto = productos.idproducto
@@ -149,12 +149,13 @@ function imprimir() {
             WHERE idventa='$idventa'");
 
         foreach ($datadet as $row) {
+            $pu = isset($row['precio_unitario']) ? number_format((float)$row['precio_unitario'], 2, '.', '') : $row['valor_unitario'];
         ?>
         <tr>
             <td><?php echo htmlspecialchars($row['item']); ?></td>
             <td><?php echo htmlspecialchars($row['cantidad']); ?></td>
             <td><?php echo htmlspecialchars($row['descripcion'] . '/' . $row['presentacion']); ?></td>
-            <td><?php echo htmlspecialchars($row['valor_unitario']); ?></td>
+            <td><?php echo htmlspecialchars($pu); ?></td>
             <td align='right'><?php echo htmlspecialchars($row['importe_total']); ?></td>
         </tr>
         <?php

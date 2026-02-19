@@ -117,6 +117,7 @@ $pdf->SetFont('Arial','',8);
 $datadet=$obj->consultar("SELECT detalleventa.item
      , detalleventa.cantidad
      , productos.descripcion
+     , detalleventa.precio_unitario
      , detalleventa.valor_unitario
      , detalleventa.valor_total
 		 , detalleventa.importe_total
@@ -127,10 +128,11 @@ INNER JOIN productos
 ON detalleventa.idproducto = productos.idproducto
 WHERE idventa='$idventa'");
 		    foreach((array)$datadet as $fila){
+					$pu = isset($fila['precio_unitario']) ? number_format((float)$fila['precio_unitario'], 2, '.', '') : $fila['valor_unitario'];
 					$pdf->Cell(10,6,$fila['item'],1,0,'C',0);
 					$pdf->Cell(20,6,$fila['cantidad'],1,0,'C',0);
 					$pdf->Cell(100,6,$fila['descripcion'],1,0,'L',0);
-					$pdf->Cell(20,6,$fila['valor_unitario'],1,0,'C',0);
+					$pdf->Cell(20,6,$pu,1,0,'C',0);
 					$pdf->Cell(25,6,$fila['importe_total'],1,1,'C',0);
 	}
 
@@ -162,7 +164,7 @@ $ruta_qr = $nombrexml.'.png';
 
 QRcode::png($text_qr, $ruta_qr, 'Q',15, 0);
 
-$pdf->Image($ruta_qr, 80 , $pdf->GetY(),25,25);
+$pdf->Image($ruta_qr, 92 , $pdf->GetY(),25,25);
 
 $pdf->Ln(30);
 $pdf->Cell(160,6,utf8_decode("Representacion impresa de la Boleta/Factura de venta Electronica"),0,0,'C',0);

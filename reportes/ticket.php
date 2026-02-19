@@ -158,15 +158,15 @@ input{display:none;}
 			</tr>
 
 		</table>
-		<table border="0" width="300px" align="center" class="zona_impresion">
+		<table border="0" width="400px" align="center" class="zona_impresion">
 			<br>
 
 			<tr>
-				<td width="49"><b>ITEM</td>
-				<td width="219"><b>CANTIDAD</td>
-				<td width="49"><b>PRODUCTO</td>
-				<td width="49"><b>P.U.</td>
-				<td width="68" align="right"><b>SUBTOTAL</b></td>
+				<td width="35"><b>ITEM</b></td>
+				<td width="45"><b>CANT.</b></td>
+				<td width="180"><b>PRODUCTO</b></td>
+				<td width="55"><b>P.U.</b></td>
+				<td width="65" align="right"><b>SUBTOTAL</b></td>
 			</tr>
 			<tr>
 				<td colspan="5">=======================================================</td>
@@ -176,6 +176,7 @@ input{display:none;}
   detalleventa.item,
   detalleventa.cantidad,
   productos.descripcion,
+  detalleventa.precio_unitario,
   detalleventa.valor_unitario,
   detalleventa.valor_total,
   detalleventa.importe_total,
@@ -188,12 +189,13 @@ FROM detalleventa
     ON productos.idpresentacion = presentacion.idpresentacion
 		WHERE idventa='$idventa'");
 			foreach ((array) $datadet as $row) {
+				$pu = isset($row['precio_unitario']) ? number_format((float)$row['precio_unitario'], 2, '.', '') : $row['valor_unitario'];
 				?>
 				<tr>
 					<td><?php echo $row['item']; ?></td>
 					<td><?php echo $row['cantidad']; ?></td>
-					<td><?php echo $row['descripcion'] . '/' . $row['presentacion']; ?>
-					<td><?php echo $row['valor_unitario']; ?>
+					<td><?php echo $row['descripcion'] . '/' . $row['presentacion']; ?></td>
+					<td><?php echo $pu; ?></td>
 					<td align='right'><?php echo $row['importe_total']; ?></td>
 				</tr>
 				<?php
@@ -275,15 +277,12 @@ FROM detalleventa
 			QRcode::png($text_qr, $ruta_qr);
 			?>
 			<tr>
-			<tr>
-				<td colspan="3" align="center">
-					<?php
-					//$png = imagecreatefrompng(QRcode::png($ruta_qr));
-					echo "<img src='$ruta_qr'>";
-					?>
+				<td colspan="5" align="center" style="text-align: center;">
+					<?php echo "<img src='$ruta_qr' style='display: block; margin-left: auto; margin-right: auto;'>"; ?>
 				</td>
 			</tr>
-			<td colspan="5" align="center">Representacion impresa de la Boleta/Factura de venta Electronica</td>
+			<tr>
+				<td colspan="5" align="center">Representacion impresa de la Boleta/Factura de venta Electronica</td>
 			</tr>
 			<tr>
 				<!-- <td colspan="3" align="left"><input type="button" onClick="location.href='../venta/index.php'" value="regresar"></td> -->
