@@ -95,14 +95,16 @@ foreach((array)$result_lote as $row) { $id_lote_default = $row['idlote']; }
 								// Ordenar para que "SIN LOTE" o "0000" aparezca primero
 								$result=$objproductos->consultar("SELECT * FROM lote ORDER BY CASE WHEN numero LIKE '%SIN LOTE%' OR numero = '0000' THEN 0 ELSE 1 END, numero ASC");
 								foreach((array)$result as $row){
-									if($row['idlote']==$txtlo){
-										echo '<option value="'.$row['idlote'].'" selected>'.$row['numero'].' (Vence: '.$row['fecha_vencimiento'].')</option>';
-									}else{
-										echo '<option value="'.$row['idlote'].'">'.$row['numero'].' (Vence: '.$row['fecha_vencimiento'].')</option>';
-									}
+									$fv = isset($row['fecha_vencimiento']) ? $row['fecha_vencimiento'] : '';
+									$sel = isset($txtlo) && $row['idlote']==$txtlo ? ' selected' : '';
+									echo '<option value="'.$row['idlote'].'" data-numero="'.htmlspecialchars($row['numero'], ENT_QUOTES, 'UTF-8').'" data-fecha="'.htmlspecialchars($fv, ENT_QUOTES, 'UTF-8').'"'.$sel.'>'.$row['numero'].' (Vence: '.$fv.')</option>';
 								}
 							?>
 						</select>
+				</div>
+				<div class="col-md-6 form-group">
+						<label><strong>Fecha de vencimiento</strong></label>
+						<input type="date" class="form-control" name="txtfv" id="txtfv" placeholder="Opcional: fecha vencimiento del lote">
 				</div>
 
 				<div class="col-md-6 form-group">
@@ -327,9 +329,22 @@ function cambiarClaseProducto(clase) {
 	}
 }
 
-// Inicializar en medicamento por defecto
+// Sincronizar fecha de vencimiento al cambiar el lote seleccionado
+document.getElementById('txtlo').addEventListener('change', function() {
+	var opt = this.options[this.selectedIndex];
+	var fecha = opt.getAttribute('data-fecha');
+	var txtfv = document.getElementById('txtfv');
+	if (txtfv && fecha) txtfv.value = fecha;
+});
+
+// Al cargar, rellenar fecha del lote por defecto
 document.addEventListener('DOMContentLoaded', function() {
 	cambiarClaseProducto('medicamento');
+	var lo = document.getElementById('txtlo');
+	if (lo && lo.options.length) {
+		var opt = lo.options[lo.selectedIndex];
+		if (opt && opt.getAttribute('data-fecha')) document.getElementById('txtfv').value = opt.getAttribute('data-fecha');
+	}
 });
 </script>
 <?php include("../central/pieproducto.php");?>

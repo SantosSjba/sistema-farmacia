@@ -30,6 +30,14 @@ $data=$objproductos->consultar("SELECT * FROM productos WHERE idproducto='".$obj
 			$tafec=$row["idtipoaf"];
 			$tipo_pre=$row["tipo_precio"];
 		}
+		// Fecha de vencimiento del lote (editable)
+		$fecha_venc = '';
+		if (!empty($lote)) {
+			$rl = $objproductos->consultar("SELECT fecha_vencimiento FROM lote WHERE idlote = " . intval($lote) . " LIMIT 1");
+			if (is_array($rl) && count($rl) > 0 && !empty($rl[0]['fecha_vencimiento'])) {
+				$fecha_venc = $rl[0]['fecha_vencimiento'];
+			}
+		}
 
 ?>
 <!DOCTYPE html>
@@ -58,18 +66,20 @@ $data=$objproductos->consultar("SELECT * FROM productos WHERE idproducto='".$obj
 
 				<div class="col-md-6 form-group">
 						<label><strong>Lote</strong></label>
-						<select name="txtlo" class='form-control'>
+						<select name="txtlo" id="txtlo" class='form-control'>
 								<?php
-																		$result=$objproductos->consultar("select * from lote");
+																		$result=$objproductos->consultar("SELECT * FROM lote ORDER BY CASE WHEN numero LIKE '%SIN LOTE%' OR numero = '0000' THEN 0 ELSE 1 END, numero ASC");
 																		foreach((array)$result as $row){
-																		if($row['idlote']==$lote){
-																			echo '<option value="'.$row['idlote'].'" selected>'.$row['numero'].'</option>';
-																		}else{
-																			echo '<option value="'.$row['idlote'].'">'.$row['numero'].'</option>';
+																		$fv = isset($row['fecha_vencimiento']) ? $row['fecha_vencimiento'] : '';
+																		$sel = ($row['idlote'] == $lote) ? ' selected' : '';
+																		echo '<option value="'.$row['idlote'].'" data-fecha="'.htmlspecialchars($fv, ENT_QUOTES, 'UTF-8').'"'.$sel.'>'.$row['numero'].' (Vence: '.$fv.')</option>';
 																		}
-																	}
 									?>
 							</select>
+					</div>
+					<div class="col-md-6 form-group">
+						<label><strong>Fecha de vencimiento</strong></label>
+						<input type="date" class="form-control" name="txtfv" id="txtfv" value="<?php echo htmlspecialchars($fecha_venc, ENT_QUOTES, 'UTF-8'); ?>">
 					</div>
 
 					<div class="col-md-6 form-group">
@@ -227,7 +237,7 @@ $data=$objproductos->consultar("SELECT * FROM productos WHERE idproducto='".$obj
 									<button type="submit" value="modificar" class="btn btn-info"><i class="entypo-pencil"></i>Modificar</button>
 									<input type="hidden" name="funcion" id="funcion" value="modificar"/>
 									<input type="hidden" name="cod" value="<?php echo $cod;?>"/>
-											 <a class="btn btn btn-green" href="index.php"><i class="entypo-cancel"></i> Cancelar</a></button>
+											 <a class="btn btn btn-green" href="index.php"><i class="entypo-cancel"></i> Cancelar</a>
 								</div>
 				</div>
 				</form>
@@ -240,5 +250,19 @@ $data=$objproductos->consultar("SELECT * FROM productos WHERE idproducto='".$obj
 </div>
 	</div>
 	</div>
+<script type="text/javascript">
+// Sincronizar fecha de vencimiento al cambiar el lote
+document.addEventListener('DOMContentLoaded', function() {
+	var sel = document.getElementById('txtlo');
+	var txtfv = document.getElementById('txtfv');
+	if (sel && txtfv) {
+		sel.addEventListener('change', function() {
+			var opt = this.options[this.selectedIndex];
+			var fecha = opt.getAttribute('data-fecha');
+			if (fecha) txtfv.value = fecha;
+		});
+	}
+});
+</script>
 </html>
 <?php include("../central/pieproducto.php");?>

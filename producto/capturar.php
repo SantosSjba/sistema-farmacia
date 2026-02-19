@@ -14,6 +14,7 @@ if($funcion=="modificar"){
   $cod = intval(isset($_POST['cod']) ? $_POST['cod'] : 0);
   $cb = $obj->real_escape_string(trim(isset($_POST['txtcb']) ? $_POST['txtcb'] : ''));
   $lo = intval(isset($_POST['txtlo']) ? $_POST['txtlo'] : 1);
+  $txtfv = trim(isset($_POST['txtfv']) ? $_POST['txtfv'] : '');
   $de = $obj->real_escape_string(trim(isset($_POST['txtde']) ? $_POST['txtde'] : ''));
   $ti = $obj->real_escape_string(trim(isset($_POST['txtti']) ? $_POST['txtti'] : 'Generico'));
   $st = intval(isset($_POST['txtst']) ? $_POST['txtst'] : 0);
@@ -51,6 +52,12 @@ if($funcion=="modificar"){
   if(empty($tidcli)) {
     $result_lab = $obj->consultar("SELECT idcliente FROM cliente WHERE tipo='laboratorio' LIMIT 1");
     foreach((array)$result_lab as $row) { $tidcli = $row['idcliente']; }
+  }
+
+  // Actualizar fecha de vencimiento del lote si se envió
+  if (!empty($txtfv) && $lo > 0) {
+    $txtfv_safe = $obj->real_escape_string($txtfv);
+    $obj->ejecutar("UPDATE lote SET fecha_vencimiento = '" . $txtfv_safe . "' WHERE idlote = " . $lo);
   }
 
 $sql="UPDATE `productos` SET `codigo`='$cb',`idlote`='$lo',`descripcion`='$de',
@@ -140,6 +147,28 @@ if($funcion=="registrar"){
       $result_lote = $obj->consultar("SELECT idlote FROM lote LIMIT 1");
     }
     foreach((array)$result_lote as $row) { $lo = intval($row['idlote']); }
+  }
+
+  // Si se ingresó fecha de vencimiento: usar o crear lote con esa fecha
+  $txtfv = trim(isset($_POST['txtfv']) ? $_POST['txtfv'] : '');
+  if (!empty($txtfv)) {
+    $txtfv_safe = $obj->real_escape_string($txtfv);
+    $rl = $obj->consultar("SELECT numero FROM lote WHERE idlote = " . intval($lo) . " LIMIT 1");
+    $numero_lote = 'SIN LOTE';
+    if (is_array($rl) && count($rl) > 0) {
+      $numero_lote = isset($rl[0]['numero']) ? $obj->real_escape_string($rl[0]['numero']) : 'SIN LOTE';
+    }
+    $existe = $obj->consultar("SELECT idlote FROM lote WHERE numero = '" . $numero_lote . "' AND fecha_vencimiento = '" . $txtfv_safe . "' LIMIT 1");
+    if (is_array($existe) && count($existe) > 0) {
+      $lo = intval($existe[0]['idlote']);
+    } else {
+      $obj->ejecutar("INSERT INTO lote (numero, fecha_vencimiento, idsucu_c) VALUES ('" . $numero_lote . "','" . $txtfv_safe . "','1')");
+      $lo = $obj->insert_id();
+      if (empty($lo)) {
+        $r2 = $obj->consultar("SELECT idlote FROM lote WHERE numero = '" . $numero_lote . "' AND fecha_vencimiento = '" . $txtfv_safe . "' ORDER BY idlote DESC LIMIT 1");
+        if (is_array($r2) && count($r2) > 0) $lo = intval($r2[0]['idlote']);
+      }
+    }
   }
   
   // Validar que todos los campos requeridos tengan valores
