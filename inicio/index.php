@@ -61,7 +61,9 @@ foreach((array)$result_ventas as $row){
     $ventas = isset($row['total_ventas']) ? (float)$row['total_ventas'] : 0;
 }
 
-$result_costos = $obj->consultar("SELECT COALESCE(SUM(productos.precio_compra * detalleventa.cantidad), 0) AS total_costos 
+// Costo de ventas: precio_compra actual * cantidad por línea. Se limita a importe_total por línea
+// para no inflar el costo si precio_compra cambió después (ej. compras recientes más caras).
+$result_costos = $obj->consultar("SELECT COALESCE(SUM(LEAST(productos.precio_compra * detalleventa.cantidad, detalleventa.importe_total)), 0) AS total_costos 
                                    FROM detalleventa 
                                    INNER JOIN productos ON detalleventa.idproducto = productos.idproducto 
                                    INNER JOIN venta ON detalleventa.idventa = venta.idventa 
