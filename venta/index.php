@@ -22,11 +22,54 @@ foreach ($data as $row) {
 	<link rel="stylesheet" href="../assets/alert/alertify/alertify.css">
 	<link rel="stylesheet" href="../assets/alert/alertify/themes/default.css">
 	<link rel="stylesheet" href="../assets/ui/jquery-ui.css">
-
-	<!-- <link rel="stylesheet" href="../assets/alert/jquery-ui.css"> -->
+	<style>
+		/* Loader global */
+		#venta-loader-overlay {
+			display: none;
+			position: fixed;
+			top: 0; left: 0; right: 0; bottom: 0;
+			background: rgba(255,255,255,0.75);
+			z-index: 9999;
+			justify-content: center;
+			align-items: center;
+		}
+		#venta-loader-overlay.activo { display: flex; }
+		.venta-loader-spinner {
+			width: 50px; height: 50px;
+			border: 4px solid #e0e0e0;
+			border-top-color: #3498db;
+			border-radius: 50%;
+			animation: venta-spin 0.9s linear infinite;
+		}
+		.venta-loader-msg {
+			position: absolute;
+			margin-top: 70px;
+			color: #333;
+			font-weight: 500;
+		}
+		@keyframes venta-spin { to { transform: rotate(360deg); } }
+		/* Loader en sección carrito */
+		#live_data.loading { position: relative; min-height: 120px; }
+		#live_data.loading::after {
+			content: '';
+			position: absolute;
+			top: 50%; left: 50%;
+			width: 36px; height: 36px;
+			margin: -18px 0 0 -18px;
+			border: 3px solid #e0e0e0;
+			border-top-color: #3498db;
+			border-radius: 50%;
+			animation: venta-spin 0.8s linear infinite;
+		}
+		.btn_add.loading, .btn_delete.loading { pointer-events: none; opacity: 0.7; }
+	</style>
 </head>
 
 <body class="page-body">
+	<div id="venta-loader-overlay" aria-hidden="true">
+		<div class="venta-loader-spinner"></div>
+		<div class="venta-loader-msg" id="venta-loader-msg">Cargando...</div>
+	</div>
 	<div class="page-container">
 		<div class="main-content">
 			<?php include('../central/cabecera.php'); ?>
@@ -69,7 +112,7 @@ foreach ($data as $row) {
 					<div class="panel panel-info">
 						<div class="panel-footer">
 							<div align="center">
-								<button type="button" class="btn btn-info" onClick="location.href='limpiar.php'"><span
+								<button type="button" id="btn_nuevo" class="btn btn-info"><span
 										class="glyphicon glyphicon-refresh"> Nuevo</span></button>
 								<button type="submit" name="btn_guardar" id="btn_guardar" class="btn btn-primary"><span
 										class="glyphicon glyphicon-floppy-saved"> Registrar</span></button>
@@ -350,40 +393,55 @@ foreach ($data as $row) {
 	</script>
 	<script>
 		$(document).ready(function () {
+			function showLoader(msg) {
+				$('#venta-loader-msg').text(msg || 'Cargando...');
+				$('#venta-loader-overlay').addClass('activo');
+			}
+			function hideLoader() {
+				$('#venta-loader-overlay').removeClass('activo');
+			}
+			function setCarritoLoading(on) {
+				if (on) $('#live_data').addClass('loading'); else $('#live_data').removeClass('loading');
+			}
+
 			function fetch_data() {
+				setCarritoLoading(true);
 				$.ajax({
 					url: "consultacarrito.php",
 					method: "POST",
 					success: function (data) {
 						$('#live_data').html(data);
-					}
+					},
+					complete: function () { setCarritoLoading(false); }
 				});
 			}
 			fetch_data();
-			//calculo del igv , subtotal, etc
 			function fetch_igv() {
 				$.ajax({
 					url: "consultaigv.php",
 					method: "POST",
-					success: function (data) {
-						$('#live_igv').html(data);
-
-					}
+					success: function (data) { $('#live_igv').html(data); }
 				});
 			}
 			fetch_igv();
-
 			function fetch_total() {
 				$.ajax({
 					url: "consultatotal.php",
 					method: "POST",
-					success: function (data) {
-						$('#live_total').html(data);
-
-					}
+					success: function (data) { $('#live_total').html(data); }
 				});
 			}
 			fetch_total();
+
+			// Tras registrar venta: refrescar carrito (ya vacío en servidor) y limpiar montos
+			$(document).on('venta-registrada', function () {
+				fetch_data();
+				fetch_igv();
+				fetch_total();
+				$('#recibo').val('');
+				$('#vuelto').val('');
+				$('#total').val('');
+			});
 
 			$('#tarjeta').hide();
 			// Muestra campos según forma de pago: efectivo (recibo/vuelto) o otros (Nº operación opcional)
@@ -409,64 +467,104 @@ foreach ($data as $row) {
 			$(document).on('submit', '#barcode_form', function (event) {
 				event.preventDefault();
 				var cod = $('#cod').val();
+				if (!cod || !cod.toString().trim()) return;
+				showLoader('Agregando producto...');
 				$.ajax({
 					url: "guardarcarrito.php",
 					method: "POST",
 					data: { cod: cod },
 					dataType: "text",
 					success: function (data) {
-						console.log(cod);
-						console.log(data);
-						//alertify.alert('Agregar',data);
 						fetch_data();
 						fetch_igv();
 						fetch_total();
 						limpiar();
-					}
-				})
+						if (typeof alertify !== 'undefined') alertify.success('Agregado al carrito');
+					},
+					error: function () {
+						if (typeof alertify !== 'undefined') alertify.error('Error al agregar');
+					},
+					complete: function () { hideLoader(); }
+				});
 			});
 
-			// guardar por descripcion
+			// guardar por descripcion (desde modal)
 			$(document).on('click', '.btn_add', function () {
-				var idproducto = $(this).data("id1");
-				var des = $(this).data("id2");
-				var pres = $(this).data("id3");
-				var pre = $(this).data("id4");
-				//var dsc = $(this).data("id5");
-				//console.log("Datos enviados:", { idproducto, des, pres, pre});
+				var $btn = $(this);
+				if ($btn.hasClass('loading')) return;
+				var idproducto = $btn.data("id1");
+				var des = $btn.data("id2");
+				var pres = $btn.data("id3");
+				var pre = $btn.data("id4");
+				$btn.addClass('loading').prop('disabled', true);
+				showLoader('Agregando producto...');
 				$.ajax({
 					url: "guardarcarrito2.php",
 					method: "POST",
 					data: { idproducto: idproducto, des: des, pres: pres, pre: pre},
 					dataType: "text",
 					success: function (data) {
-						//console.log("Respuesta del servidor:", data); // Ver respuesta del servidor
 						fetch_data();
 						fetch_igv();
 						fetch_total();
 						limpiar();
+						// Disminuir stock visual en la tabla del modal
+						var $row = $btn.closest('tr');
+						var $stockCell = $row.find('td:eq(6)');
+						var $span = $stockCell.find('.label');
+						if ($span.length) {
+							var n = parseInt($span.text(), 10) || 0;
+							n = Math.max(0, n - 1);
+							$span.text(n).toggleClass('label-danger', n <= 0).toggleClass('label-success', n > 0);
+						}
+						if (typeof alertify !== 'undefined') alertify.success('Agregado al carrito');
 					},
-					error: function (jqXHR, textStatus, errorThrown) {
-						//console.error("Error en la solicitud AJAX:", textStatus, errorThrown);
+					error: function () {
+						if (typeof alertify !== 'undefined') alertify.error('Error al agregar');
+					},
+					complete: function () {
+						hideLoader();
+						$btn.removeClass('loading').prop('disabled', false);
 					}
 				});
 			});
 
 			$(document).on('click', '.btn_delete', function () {
-				var id = $(this).data("id3");
-
+				var $btn = $(this);
+				if ($btn.hasClass('loading')) return;
+				var id = $btn.data("id3");
+				var cantidad = parseInt($btn.closest('tr').find('.cantidad').text(), 10) || 1;
+				$btn.addClass('loading').prop('disabled', true);
+				showLoader('Quitando del carrito...');
 				$.ajax({
 					url: "eliminarcarrito.php",
 					method: "POST",
 					data: { id: id },
 					dataType: "text",
 					success: function (data) {
-						//   alertify.alert('Venta','Producto Eliminado del carrito.', function(){
-						//
-						// });
 						fetch_data();
 						fetch_igv();
 						fetch_total();
+						// Sumar stock visualmente en la tabla del modal
+						var $modalBtn = $('#my-example').find('button.btn_add[data-id1="' + id + '"]');
+						if ($modalBtn.length) {
+							var $row = $modalBtn.closest('tr');
+							var $stockCell = $row.find('td:eq(6)');
+							var $span = $stockCell.find('.label');
+							if ($span.length) {
+								var n = parseInt($span.text(), 10) || 0;
+								n += cantidad;
+								$span.text(n).removeClass('label-danger').addClass('label-success');
+							}
+						}
+						if (typeof alertify !== 'undefined') alertify.success('Producto quitado del carrito');
+					},
+					error: function () {
+						if (typeof alertify !== 'undefined') alertify.error('Error al quitar');
+					},
+					complete: function () {
+						hideLoader();
+						$btn.removeClass('loading').prop('disabled', false);
 					}
 				});
 			});
@@ -481,35 +579,60 @@ foreach ($data as $row) {
 				$('#cod').focus();
 			}
 			function edit_data(id, text, cantidad) {
-				//var cantidad=$('#cantidad').val();
+				showLoader('Actualizando cantidad...');
 				$.ajax({
 					url: "actualizarcarrito.php",
 					method: "POST",
 					data: { id: id, text: text, cantidad: cantidad },
 					dataType: "text",
-
-				}).success(function (data) {
-					alertify.alert('mensaje', data);
-					//alert(data);
-					fetch_data();
-					fetch_igv();
-					fetch_total();
+					success: function (data) {
+						if (typeof alertify !== 'undefined') alertify.success(data);
+						fetch_data();
+						fetch_igv();
+						fetch_total();
+					},
+					error: function () {
+						if (typeof alertify !== 'undefined') alertify.error('Error al actualizar');
+					},
+					complete: function () { hideLoader(); }
 				});
 			}
 			function edit_datap(id, text, precio_unitario) {
-				//var cantidad=$('#cantidad').val();
+				showLoader('Actualizando precio...');
 				$.ajax({
 					url: "actualizarcarritop.php",
 					method: "POST",
 					data: { id: id, text: text, precio_unitario: precio_unitario },
 					dataType: "text",
-
-				}).success(function (data) {
-					alertify.alert('mensaje', data);
-					//alert(data);
-					fetch_data();
-					fetch_igv();
-					fetch_total();
+					success: function (data) {
+						if (typeof alertify !== 'undefined') alertify.success(data);
+						fetch_data();
+						fetch_igv();
+						fetch_total();
+					},
+					error: function () {
+						if (typeof alertify !== 'undefined') alertify.error('Error al actualizar');
+					},
+					complete: function () { hideLoader(); }
+				});
+			}
+			function edit_datad(id, text, descuento) {
+				showLoader('Actualizando...');
+				$.ajax({
+					url: "actualizarcarritod.php",
+					method: "POST",
+					data: { id: id, text: text, descuento: descuento },
+					dataType: "text",
+					success: function (data) {
+						if (typeof alertify !== 'undefined') alertify.success(data);
+						fetch_data();
+						fetch_igv();
+						fetch_total();
+					},
+					error: function () {
+						if (typeof alertify !== 'undefined') alertify.error('Error al actualizar');
+					},
+					complete: function () { hideLoader(); }
 				});
 			}
 			$(document).on('blur', '.cantidad', function (event) {
@@ -536,6 +659,10 @@ foreach ($data as $row) {
 				edit_datad(id, descuento, "descuento");
 			});
 
+			$('#btn_nuevo').on('click', function () {
+				showLoader('Limpiando carrito...');
+				window.location.href = 'limpiar.php';
+			});
 
 		});
 	</script>
@@ -629,7 +756,11 @@ $("#recibo").keypress(function(e){
                 console.log(pair[0] + ': ' + pair[1]);
             }
 
-            // Enviar formulario por AJAX
+            // Loader y deshabilitar botón al registrar
+            var $btnReg = $('#btn_guardar');
+            $btnReg.prop('disabled', true);
+            if (typeof showLoader === 'function') showLoader('Registrando venta...');
+
             $.ajax({
                 method: "POST",
                 url: 'guardarventa.php',
@@ -639,9 +770,17 @@ $("#recibo").keypress(function(e){
             })
             .done(function (html) {
                 $("#msn").html(html);
-               /*  setTimeout(function () {
-                    location.reload();
-                }, 2000); */
+                if (html.indexOf('VENTA REALIZADA') !== -1) {
+                    $(document).trigger('venta-registrada');
+                    if (typeof alertify !== 'undefined') alertify.success('Venta registrada');
+                }
+            })
+            .fail(function () {
+                if (typeof alertify !== 'undefined') alertify.error('Error al registrar la venta');
+            })
+            .always(function () {
+                $btnReg.prop('disabled', false);
+                if (typeof hideLoader === 'function') hideLoader();
             });
         });
     });
