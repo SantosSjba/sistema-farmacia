@@ -30,6 +30,8 @@ if (!empty($_GET['idventa'])) {
 					 , venta.fecha_emision
 					 , venta.efectivo
 					 , venta.vuelto
+					 , venta.formadepago
+					 , venta.numope
 			     , tipo_comprobante.descripcion
 			     , serie.serie
 			     , serie.correlativo
@@ -60,6 +62,8 @@ if (!empty($_GET['idventa'])) {
 		$fecha = $row['fecha_emision'];
 		$efectivo = $row['efectivo'];
 		$vuelto = $row['vuelto'];
+		$formadepago = isset($row['formadepago']) ? $row['formadepago'] : 'EFECTIVO';
+		$numope = isset($row['numope']) ? $row['numope'] : '';
 	}
 }
 ?>
@@ -231,6 +235,19 @@ FROM detalleventa
 			</tr>
 			<tr>
 				<td>&nbsp;</td>
+				<td colspan="3" align="right"><?php echo 'FORMA DE PAGO:'; ?></td>
+				<td align="right"><?php echo htmlspecialchars($formadepago); ?></td>
+			</tr>
+			<?php if (!empty($numope)) { ?>
+			<tr>
+				<td>&nbsp;</td>
+				<td colspan="3" align="right"><?php echo 'Nº OPERACIÓN:'; ?></td>
+				<td align="right"><?php echo htmlspecialchars($numope); ?></td>
+			</tr>
+			<?php } ?>
+			<?php if (floatval($efectivo) > 0) { ?>
+			<tr>
+				<td>&nbsp;</td>
 				<td colspan="3" align="right"><?php echo 'EFECTIVO:'; ?></td>
 				<td align="right"><?php echo $efectivo; ?></td>
 			</tr>
@@ -239,6 +256,7 @@ FROM detalleventa
 				<td colspan="3" align="right"><?php echo 'VUELTO:'; ?></td>
 				<td align="right"><?php echo $vuelto; ?></td>
 			</tr>
+			<?php } ?>
 			<tr>
 				<td colspan="5" align="left"><?php echo "SON:" . " " . CantidadEnLetra($total); ?></td>
 			</tr>

@@ -128,13 +128,18 @@ foreach ($data as $row) {
 									<select name="forma" id="forma" required class="form-control">
 										<option value="">SELECCIONE</option>
 										<option value="EFECTIVO">EFECTIVO</option>
+										<option value="YAPE">YAPE</option>
+										<option value="PLIN">PLIN</option>
+										<option value="TRANSFERENCIA">TRANSFERENCIA</option>
 										<option value="TARJETA">TARJETA</option>
-										<option value="DEPOSITO EN CUENTA">DEPOSITO EN CUENTA</option>
+										<option value="DEPOSITO EN CUENTA">DEPÓSITO EN CUENTA</option>
+										<option value="OTRO">OTRO</option>
 									</select><br>
 									<table id="tarjeta">
 										<tr>
-											<input type="number" id="numope" name="numope" min="0" class="form-control"
-												placeholder="numero de operacion" />
+											<td><label>Nº operación / Referencia:</label></td>
+											<td><input type="text" id="numope" name="numope" class="form-control"
+												placeholder="Opcional: número de operación" /></td>
 										</tr>
 									</table><br>
 
@@ -380,26 +385,24 @@ foreach ($data as $row) {
 			}
 			fetch_total();
 
-			$('#numope').hide();
-			// muestra segun el select de la forma de pago segun seleccionado
+			$('#tarjeta').hide();
+			// Muestra campos según forma de pago: efectivo (recibo/vuelto) o otros (Nº operación opcional)
 			$('#forma').change(function () {
 				var f = $('#forma').val();
 				if (f == 'EFECTIVO') {
 					$('#efectivo').show();
-					$('#efectivo').val('');
+					$('#recibo').val('');
+					$('#vuelto').val('');
 					$('#tarjeta').hide();
-					$('#numope').hide();
-				}
-				if (f == 'TARJETA') {
+					$('#numope').val('');
+				} else if (f == 'TARJETA' || f == 'YAPE' || f == 'PLIN' || f == 'TRANSFERENCIA' || f == 'OTRO') {
 					$('#tarjeta').show();
-					$('#tarjeta').val('');
 					$('#efectivo').hide();
-					$('#numope').show();
-				}
-				if (f == 'DEPOSITO EN CUENTA') {
+					$('#numope').val('');
+				} else {
 					$('#tarjeta').hide();
 					$('#efectivo').hide();
-					$('#numope').hide();
+					$('#numope').val('');
 				}
 			});
 			// guardar por codigo de barra

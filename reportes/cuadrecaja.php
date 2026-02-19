@@ -48,24 +48,18 @@ if ($monto_res && count($monto_res) > 0) {
 } else {
     die('No hay datos de apertura de caja para el usuario y fecha seleccionados.');
 }
-// Obtener ventas en efectivo (usar dia_cuadre y usuario del cajero)
-$ventas_e = $obj->consultar("SELECT * FROM venta WHERE fecha_emision = '" . $obj->real_escape_string($dia_cuadre) . "' AND idusuario = '$usuario' AND formadepago='EFECTIVO'");
-    foreach ((array)$ventas_e as $row) {
-        $ef = $formaefectivo += $row['total'];
-        $efectivo = number_format($ef, 2);
-    }
-// Obtener ventas con tarjeta
-$ventas_t = $obj->consultar("SELECT * FROM venta WHERE fecha_emision = '" . $obj->real_escape_string($dia_cuadre) . "' AND idusuario = '$usuario' AND formadepago='TARJETA'");
-    foreach ((array)$ventas_t as $row) {
-        $ta = $formatarjeta += $row['total'];
-        $tarjeta = number_format($ta, 2);
-    }
-// Obtener ventas con depositos
-$ventas_d = $obj->consultar("SELECT * FROM venta WHERE fecha_emision = '" . $obj->real_escape_string($dia_cuadre) . "' AND idusuario = '$usuario' AND formadepago='DEPOSITO EN CUENTA'");
-    foreach ((array)$ventas_d as $row) {
-        $de = $formadeposito += $row['total'];
-        $deposito = number_format($de, 2);
-    }
+// Resumen por forma de pago (EFECTIVO, YAPE, PLIN, TARJETA, etc.)
+$por_forma = array();
+$ventas_por_forma = $obj->consultar("SELECT formadepago, COALESCE(SUM(total), 0) as total FROM venta WHERE fecha_emision = '" . $obj->real_escape_string($dia_cuadre) . "' AND idusuario = '$usuario' GROUP BY formadepago");
+foreach ((array)$ventas_por_forma as $row) {
+    $por_forma[$row['formadepago']] = floatval($row['total']);
+}
+$formaefectivo = isset($por_forma['EFECTIVO']) ? $por_forma['EFECTIVO'] : 0;
+$formatarjeta = isset($por_forma['TARJETA']) ? $por_forma['TARJETA'] : 0;
+$formadeposito = isset($por_forma['DEPOSITO EN CUENTA']) ? $por_forma['DEPOSITO EN CUENTA'] : 0;
+$efectivo = number_format($formaefectivo, 2);
+$tarjeta = number_format($formatarjeta, 2);
+$deposito = number_format($formadeposito, 2);
 // Obtener cierre de caja (por usuario y fecha del cuadre)
 $result = $obj->consultar("SELECT * FROM caja_cierre WHERE usuario = '" . $obj->real_escape_string($usu_cuadre) . "' AND fecha = '" . $obj->real_escape_string($dia_cuadre) . "'");
 
@@ -183,20 +177,19 @@ function regresa()
     <td colspan="2">-------------------------------------------------------------------------------------</td>
     </tr>
   <tr>
-    <td colspan="2">RESUMEN:</td>
+    <td colspan="2">RESUMEN POR FORMA DE PAGO:</td>
     </tr>
-    <tr>
-    <td>PAGOS EN EFECTIVO:</td>
-    <td><?php if(isset($efectivo)) echo "$efectivo"; ?></td>
-  </tr>
+    <?php
+    foreach ((array)$por_forma as $nombre_forma => $monto) {
+        $monto_f = number_format($monto, 2);
+        $etiqueta = $nombre_forma;
+        if ($nombre_forma === 'DEPOSITO EN CUENTA') $etiqueta = 'DEPÓSITOS';
+    ?>
   <tr>
-    <td>PAGOS CON TARJETA:</td>
-    <td><?php if(isset($tarjeta)) echo "$tarjeta"; ?></td>
+    <td><?php echo htmlspecialchars($etiqueta); ?>:</td>
+    <td><?php echo $monto_f; ?></td>
   </tr>
-  <tr>
-    <td>PAGOS EN DEPOSITOS:</td>
-    <td><?php if(isset($deposito)) echo "$deposito"; ?></td>
-  </tr>
+    <?php } ?>
   <tr>
     <td colspan="2">------------------------------------------------------------------------------------</td>
   </tr>

@@ -39,6 +39,8 @@ if (!empty($_GET['idventa'])) {
 	venta.fecha_emision,
 	venta.efectivo,
 	venta.vuelto,
+	venta.formadepago,
+	venta.numope,
 	tipo_comprobante.descripcion,
 	serie.serie,
 	serie.correlativo,
@@ -71,6 +73,8 @@ if (!empty($_GET['idventa'])) {
 		$fecha = $row['fecha_emision'];
 		$efectivo = $row['efectivo'];
 		$vuelto = $row['vuelto'];
+		$formadepago = isset($row['formadepago']) ? $row['formadepago'] : 'EFECTIVO';
+		$numope = isset($row['numope']) ? $row['numope'] : '';
 		$usuario = $row['usuario'];
 	}
 }
@@ -155,8 +159,14 @@ $printer->text(str_repeat("-", $ancho_ticket) . "\n");
 $printer->text(str_pad("SubTotal", $ancho_label) . str_pad("S/ " . number_format($op_gravadas, 2), $ancho_valor, " ", STR_PAD_LEFT) . "\n");
 $printer->text(str_pad("IGV-18 %", $ancho_label) . str_pad("S/ " . number_format($igv, 2), $ancho_valor, " ", STR_PAD_LEFT) . "\n");
 $printer->text(str_pad("Total", $ancho_label) . str_pad("S/ " . number_format($total, 2), $ancho_valor, " ", STR_PAD_LEFT) . "\n");
-$printer->text(str_pad("Efectivo", $ancho_label) . str_pad("S/ " . number_format($efectivo, 2), $ancho_valor, " ", STR_PAD_LEFT) . "\n");
-$printer->text(str_pad("Vuelto", $ancho_label) . str_pad("S/ " . number_format($vuelto, 2), $ancho_valor, " ", STR_PAD_LEFT) . "\n");
+$printer->text(str_pad("Forma de pago", $ancho_label) . str_pad($formadepago, $ancho_valor, " ", STR_PAD_LEFT) . "\n");
+if (!empty($numope)) {
+	$printer->text(str_pad("N. Operacion", $ancho_label) . str_pad($numope, $ancho_valor, " ", STR_PAD_LEFT) . "\n");
+}
+if (floatval($efectivo) > 0) {
+	$printer->text(str_pad("Efectivo", $ancho_label) . str_pad("S/ " . number_format($efectivo, 2), $ancho_valor, " ", STR_PAD_LEFT) . "\n");
+	$printer->text(str_pad("Vuelto", $ancho_label) . str_pad("S/ " . number_format($vuelto, 2), $ancho_valor, " ", STR_PAD_LEFT) . "\n");
+}
 
 // Corte de ticket
 $printer->cut();

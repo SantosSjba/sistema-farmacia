@@ -147,16 +147,19 @@ $data_s=$obj->consultar("SELECT MAX(idserie) as idserie FROM serie");
 // $sql_us = "UPDATE serie SET correlativo = correlativo + 1  WHERE idserie='$idserie_s'";
 // $obj->ejecutar($sql_us);
 //insertar serie
-//$idcliente=$obj->real_escape_string($_POST['idcli']);
-$efectivo=trim($obj->real_escape_string(htmlentities(strip_tags($_POST['recibo'],ENT_QUOTES))));
-$vuelto=trim($obj->real_escape_string(htmlentities(strip_tags($_POST['vuelto'],ENT_QUOTES))));
+$forma = $obj->real_escape_string(isset($_POST['forma']) ? trim($_POST['forma']) : 'EFECTIVO');
+$numope = $obj->real_escape_string(isset($_POST['numope']) ? trim($_POST['numope']) : '');
+$efectivo = trim($obj->real_escape_string(isset($_POST['recibo']) ? htmlentities(strip_tags($_POST['recibo'], ENT_QUOTES)) : '0'));
+$vuelto = trim($obj->real_escape_string(isset($_POST['vuelto']) ? htmlentities(strip_tags($_POST['vuelto'], ENT_QUOTES)) : '0'));
+if ($efectivo === '') $efectivo = '0';
+if ($vuelto === '') $vuelto = '0';
 
 $sql_s="INSERT INTO `serie`(`idserie`,`tipocomp`, `serie`, `correlativo`) VALUES ('$idserie_s','$tico','$serie_p','$correlativo_p')";
 $obj->ejecutar($sql_s);
 $nombrexml = 'R-'.''.$ruc.'-'.$tico.'-'.$serie_p.'-'.$correlativo_p.'.XML';
-  //guardar venta
-  $sql_v="INSERT INTO `venta`(`idventa`, `idconf`, `tipocomp`, `idcliente`, `idusuario`, `idserie`, `fecha_emision`, `op_gravadas`, `op_exoneradas`, `op_inafectas`, `igv`, `total`, `feestado`, `fecodigoerror`, `femensajesunat`, `nombrexml`, `xmlbase64`, `cdrbase64`, `efectivo`, `vuelto`, `tire`)
-                      VALUES ('$idventa','1','$tico','$idcliente','$idusuario','$idserie_s','$fecha','$op_gravadas','$op_exoneradas','$op_inafectas','$igv','$total',null,null,null,'$nombrexml',null,null,'$efectivo','$vuelto','$tire')";
+  //guardar venta (formadepago y numope para Yape, Plin, Transferencia, etc.)
+  $sql_v="INSERT INTO `venta`(`idventa`, `idconf`, `tipocomp`, `idcliente`, `idusuario`, `idserie`, `fecha_emision`, `op_gravadas`, `op_exoneradas`, `op_inafectas`, `igv`, `total`, `feestado`, `fecodigoerror`, `femensajesunat`, `nombrexml`, `xmlbase64`, `cdrbase64`, `efectivo`, `vuelto`, `tire`, `formadepago`, `numope`)
+                      VALUES ('$idventa','1','$tico','$idcliente','$idusuario','$idserie_s','$fecha','$op_gravadas','$op_exoneradas','$op_inafectas','$igv','$total',null,null,null,'$nombrexml',null,null,'$efectivo','$vuelto','$tire','$forma','$numope')";
   $obj->ejecutar($sql_v);
 
 $it=0;

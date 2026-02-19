@@ -44,26 +44,19 @@ foreach ($monto as $row) {
 	$turno = $row['turno'];
 	$fecha_caja = $row['fecha']; // Usar la fecha de apertura de la caja
 }
-// Obtener ventas en efectivo (usar la fecha de la caja, no la fecha actual)
-$ventas_e = $obj->consultar("SELECT * FROM venta WHERE fecha_emision = '$fecha_caja' AND idusuario = '$usuario' AND formadepago='EFECTIVO'");
-foreach ((array) $ventas_e as $row) {
-	$ef = $formaefectivo += $row['total'];
-	$efectivo = number_format($ef, 2);
+// Resumen por forma de pago (EFECTIVO, YAPE, PLIN, TARJETA, etc.)
+$por_forma = array();
+$ventas_por_forma = $obj->consultar("SELECT formadepago, COALESCE(SUM(total), 0) as total FROM venta WHERE fecha_emision = '$fecha_caja' AND idusuario = '$usuario' GROUP BY formadepago");
+foreach ((array) $ventas_por_forma as $row) {
+	$por_forma[$row['formadepago']] = floatval($row['total']);
 }
-// Obtener ventas con tarjeta
-$ventas_t = $obj->consultar("SELECT * FROM venta WHERE fecha_emision = '$fecha_caja' AND idusuario = '$usuario' AND formadepago='TARJETA'");
-foreach ((array) $ventas_t as $row) {
-	$ta = $formatarjeta += $row['total'];
-	$tarjeta = number_format($ta, 2);
-}
-// Obtener ventas con depositos
-$ventas_d = $obj->consultar("SELECT * FROM venta WHERE fecha_emision = '$fecha_caja' AND idusuario = '$usuario' AND formadepago='DEPOSITO EN CUENTA'");
-foreach ((array) $ventas_d as $row) {
-	$de = $formadeposito += $row['total'];
-	$deposito = number_format($de, 2);
-}
-// Calcular la suma total
-$total = $formaefectivo + $formatarjeta + $formadeposito;
+$formaefectivo = isset($por_forma['EFECTIVO']) ? $por_forma['EFECTIVO'] : 0;
+$formatarjeta = isset($por_forma['TARJETA']) ? $por_forma['TARJETA'] : 0;
+$formadeposito = isset($por_forma['DEPOSITO EN CUENTA']) ? $por_forma['DEPOSITO EN CUENTA'] : 0;
+$efectivo = number_format($formaefectivo, 2);
+$tarjeta = number_format($formatarjeta, 2);
+$deposito = number_format($formadeposito, 2);
+$total = array_sum($por_forma);
 $total_formateado = number_format($total, 2);
 // obtener el total de ventas por usuario fecha y sucursal
 /* $ventas = $obj->consultar("SELECT * FROM venta  WHERE fecha_emision= '$dia' AND idusuario= '$usuario'");
@@ -155,6 +148,21 @@ foreach ((array) $ventas as $row) {
 											echo $deposito; ?>">
 								</div>
 							</div>
+							<?php
+							$otras_formas = array('YAPE', 'PLIN', 'TRANSFERENCIA', 'OTRO');
+							foreach ($otras_formas as $fm) {
+								if (!empty($por_forma[$fm])) {
+									$label = $fm;
+									$val = number_format($por_forma[$fm], 2);
+							?>
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Total <?php echo $label; ?>:</label>
+								<div class="col-sm-5">
+									<input type="text" class="form-control" readonly value="<?php echo $val; ?>">
+								</div>
+							</div>
+							<?php }
+							} ?>
 
 							<div class="form-group has-success">
 								<label for="field-1" class="col-sm-3 control-label">Total de ventas:</label>
