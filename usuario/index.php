@@ -59,7 +59,9 @@ $objusuario=new clsConexion;
       },
   "bDestroy": true,
   "iDisplayLength": 5,//Paginación
-    "order": [[ 0, "desc" ]]//Ordenar (columna,orden)
+    "order": [[ 0, "desc" ]],//Ordenar (columna,orden)
+  "stateSave": true,
+  "stateDuration": 60 * 60
  }).DataTable();
    });
  </script>

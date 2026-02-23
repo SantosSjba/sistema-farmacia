@@ -63,7 +63,9 @@ $(document).ready(function() {
     },
 "bDestroy": true,
 "iDisplayLength": 10,//Paginación
-  "order": [[ 0, "desc" ]]//Ordenar (columna,orden)
+  "order": [[ 0, "desc" ]],//Ordenar (columna,orden)
+"stateSave": true,
+"stateDuration": 60 * 60
 }).DataTable();
  });
 </script>

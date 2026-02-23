@@ -95,6 +95,8 @@ $objproductos = new clsConexion;
       "bDestroy": true,
       "iDisplayLength": 10,
       "order": [[0, "desc"]],
+      "stateSave": true,
+      "stateDuration": 60 * 60,
 
       initComplete: function () {
         // Aplicar estilos después de que DataTables ha renderizado
@@ -123,7 +125,7 @@ $objproductos = new clsConexion;
             data: { id: id },
             success: function (data) {
               alert(data);
-              tabla.ajax.reload();
+              tabla.ajax.reload(null, false);
               // console.log(data);
             }
           })

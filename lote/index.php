@@ -56,7 +56,9 @@ $usu=$_SESSION["usuario"];
       },
   "bDestroy": true,
   "iDisplayLength": 5,//Paginación
-    "order": [[ 0, "desc" ]]//Ordenar (columna,orden)
+    "order": [[ 0, "desc" ]],//Ordenar (columna,orden)
+  "stateSave": true,
+  "stateDuration": 60 * 60
  }).DataTable();
    });
  </script>
@@ -74,7 +76,7 @@ $usu=$_SESSION["usuario"];
 			 method:"POST",
 			 data:{id:id},
 			 success:function(data){
-				 location.reload(true);
+				 tabla.ajax.reload(null, false);
 			 }
 	 });
 		}
