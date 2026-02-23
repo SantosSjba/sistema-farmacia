@@ -111,6 +111,7 @@ $objVentas = new clsConexion;
         url: 'ventasunat_enviar.php',
         type: 'POST',
         data: { idventa: idventa },
+        beforeSend: function () { if (typeof showLoader === 'function') showLoader('Enviando a SUNAT...'); },
         success: function (response) {
           console.log('Respuesta SUNAT:', response); // ✅ Solo en consola
 
@@ -131,21 +132,22 @@ $objVentas = new clsConexion;
               url: 'error_estado.php',
               type: 'POST',
               data: { idventa: idventa },
+              beforeSend: function () { if (typeof showLoader === 'function') showLoader('Procesando...'); },
               success: function (data_er) {
                 console.log('Error de respuesta:', data_er);
-                console.log('Respuesta SUNAT:', response);
                 setTimeout(function () {
                   tabla.ajax.reload(null, false);
                 }, 2000);
               },
+              complete: function () { if (typeof hideLoader === 'function') hideLoader(); }
             });
           }
         },
         error: function (xhr, status, error) {
           alertify.error('Error en la solicitud AJAX');
-          console.error('Error AJAX:', status, error); // ✅ Solo en consola
-          console.log('Respuesta SUNAT:', response);
-        }
+          console.error('Error AJAX:', status, error);
+        },
+        complete: function () { if (typeof hideLoader === 'function') hideLoader(); }
       });
     },
     function () {

@@ -77,11 +77,12 @@ $usu=$_SESSION["usuario"];
                     method: "POST",
                     url: 'bajasunat.php',
                     data: datax,
+                    beforeSend: function () { if (typeof showLoader === 'function') showLoader('Enviando baja a SUNAT...'); },
                     success: function(response) {
                         $("#divResultado").html(response);
-                        // Actualiza la tabla después de enviar los datos
-                        $('#my-example').DataTable().ajax.reload();
-                    }
+                        $('#my-example').DataTable().ajax.reload(null, false);
+                    },
+                    complete: function () { if (typeof hideLoader === 'function') hideLoader(); }
                 });
 	}
 	/*  function Marcar(element,idcomprobante){

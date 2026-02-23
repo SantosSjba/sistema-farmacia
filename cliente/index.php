@@ -79,9 +79,11 @@ $usu=$_SESSION["usuario"];
  			url:"eliminar.php",
  			method:"POST",
  			data:{id:id},
+ 			beforeSend: function () { if (typeof showLoader === 'function') showLoader('Eliminando...'); },
  			success:function(data){
  				tabla.ajax.reload(null, false);
- 			}
+ 			},
+ 			complete: function () { if (typeof hideLoader === 'function') hideLoader(); }
  	});
  	 }
   }, function(){ alertify.error('Cancelado')});

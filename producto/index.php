@@ -123,11 +123,12 @@ $objproductos = new clsConexion;
             url: "eliminar.php",
             method: "POST",
             data: { id: id },
+            beforeSend: function () { if (typeof showLoader === 'function') showLoader('Eliminando...'); },
             success: function (data) {
               alert(data);
               tabla.ajax.reload(null, false);
-              // console.log(data);
-            }
+            },
+            complete: function () { if (typeof hideLoader === 'function') hideLoader(); }
           })
         }
         else {

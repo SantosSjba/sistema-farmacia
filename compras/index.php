@@ -202,14 +202,15 @@ $(document).ready(function(){
 						method:"POST",
 						data:{idproducto:idproducto,des:des,pres:pres,precio:precio,descuento:descuento},
 						dataType:"text",
+						beforeSend: function () { if (typeof showLoader === 'function') showLoader('Agregando...'); },
 								 success:function(data){
 									 console.log(data);
-										//alertify.alert('Agregar',data);
 										fetch_data();
 										fetch_igv();
 										fetch_total();
 										limpiar();
-								 }
+								 },
+						complete: function () { if (typeof hideLoader === 'function') hideLoader(); }
 			 })
 	});
 
@@ -220,11 +221,13 @@ $(document).ready(function(){
 								 method:"POST",
 								 data:{id:id},
 								 dataType:"text",
+								 beforeSend: function () { if (typeof showLoader === 'function') showLoader('Quitando...'); },
 								 success:function(data){
 									fetch_data();
 									fetch_igv();
 									fetch_total();
-								 }
+								 },
+								 complete: function () { if (typeof hideLoader === 'function') hideLoader(); }
 						});
 	});
 
@@ -243,13 +246,14 @@ $(document).ready(function(){
                method:"POST",
                data:{id:id,text:text,cantidad:cantidad},
                dataType:"text",
-
-          }).success(function(data){
-          alertify.alert('mensaje',data);
-           //alert(data);
-           fetch_data();
-          fetch_igv();
-          fetch_total();
+               beforeSend: function () { if (typeof showLoader === 'function') showLoader('Actualizando cantidad...'); },
+               success: function(data){
+                 alertify.alert('mensaje',data);
+                 fetch_data();
+                 fetch_igv();
+                 fetch_total();
+               },
+               complete: function () { if (typeof hideLoader === 'function') hideLoader(); }
           });
      }
      function edit_datap(id, text, precio){
@@ -258,13 +262,14 @@ $(document).ready(function(){
               method:"POST",
               data:{id:id, text:text,precio:precio},
               dataType:"text",
-
-         }).success(function(data){
-      alertify.alert('mensaje',data);
-          //alert(data);
-          fetch_data();
-           fetch_igv();
-           fetch_total();
+              beforeSend: function () { if (typeof showLoader === 'function') showLoader('Actualizando precio...'); },
+              success: function(data){
+                alertify.alert('mensaje',data);
+                fetch_data();
+                fetch_igv();
+                fetch_total();
+              },
+              complete: function () { if (typeof hideLoader === 'function') hideLoader(); }
          });
     }
 			$(document).on('blur', '.cantidad', function(event){

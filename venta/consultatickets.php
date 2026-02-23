@@ -118,6 +118,7 @@ $objVentas = new clsConexion;
               url: 'ventasunat_enviar.php',
               type: 'POST',
               data: { idventa: idventa },
+              beforeSend: function () { if (typeof showLoader === 'function') showLoader('Enviando a SUNAT...'); },
               success: function (response) {
                 if (response === 'ESTADO: ACEPTADAObservaciones') {
                   alertify.warning('ESTADO: Enviado con Observaciones');
@@ -142,19 +143,21 @@ $objVentas = new clsConexion;
                     url: 'error_estado.php',
                     type: 'POST',
                     data: { idventa: idventa },
+                    beforeSend: function () { if (typeof showLoader === 'function') showLoader('Procesando...'); },
                     success: function (data_er) {
                       console.log(data_er);
                       setTimeout(function () {
-                        tabla.ajax.reload(null, false); // `null, false` mantiene la página actual
+                        tabla.ajax.reload(null, false);
                       }, 2000);
                     },
+                    complete: function () { if (typeof hideLoader === 'function') hideLoader(); }
                   });
                 }
               },
               error: function (xhr, status, error) {
                 alertify.error('Error en la solicitud AJAX: ' + error);
-                console.error('Error en la solicitud AJAX:', status, error);
-              }
+              },
+              complete: function () { if (typeof hideLoader === 'function') hideLoader(); }
             });
           },
           function () {
@@ -192,19 +195,20 @@ $(document).on('click', '.anular', function(){
                 url: "anula_ticket.php",
                 method: "POST",
                 data: { id: id },
-                dataType: 'json',  // Asegúrate de que esperas una respuesta JSON
+                dataType: 'json',
+                beforeSend: function () { if (typeof showLoader === 'function') showLoader('Anulando ticket...'); },
                 success: function(response) {
                     if (response.status === 'success') {
                         alertify.success(response.message);
-                        // Actualizar el DataTable sin recargar la página
-                        $('#my-example').DataTable().ajax.reload(null, false); // false para mantener la página actual
+                        $('#my-example').DataTable().ajax.reload(null, false);
                     } else {
                         alertify.error(response.message);
                     }
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
                     alertify.error('Error en la solicitud AJAX: ' + textStatus);
-                }
+                },
+                complete: function () { if (typeof hideLoader === 'function') hideLoader(); }
             });
         },
         function() {

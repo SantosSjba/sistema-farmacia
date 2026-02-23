@@ -132,6 +132,7 @@ $tipo = '';
             url: "obtener_notacredito.php",
             method: "POST",
             data: { serie_n: serie_n, correlativo_n: correlativo_n },
+            beforeSend: function () { if (typeof showLoader === 'function') showLoader('Cargando...'); },
             success: function (data) {
                 if (serie_n == 'BN01') {
                     $('#correlativo_n').val(data);
@@ -141,28 +142,31 @@ $tipo = '';
                 } else if (serie_n == '') {
                     $('#correlativo_n').val('');
                 }
-            }
+            },
+            complete: function () { if (typeof hideLoader === 'function') hideLoader(); }
         });
     });
 </script>
 <script>
     document.getElementById('enviar').addEventListener('click', function (event) {
-        event.preventDefault(); // Evita que el formulario se envíe de manera tradicional
+        event.preventDefault();
 
         var serie = document.getElementById('serie_v').value;
         var correlativo = document.getElementById('correlativo_v').value;
 
+        if (typeof showLoader === 'function') showLoader('Buscando reporte...');
         var xhr = new XMLHttpRequest();
         xhr.open('POST', 'buscar_reporte.php', true);
         xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
         xhr.onload = function () {
+            if (typeof hideLoader === 'function') hideLoader();
             if (xhr.status >= 200 && xhr.status < 400) {
-                // Actualiza el contenedor con el resultado
                 document.getElementById('reporte_resultado').innerHTML = xhr.responseText;
             } else {
                 console.error('Error en la solicitud');
             }
         };
+        xhr.onerror = function () { if (typeof hideLoader === 'function') hideLoader(); };
         xhr.send('serie_v=' + encodeURIComponent(serie) + '&correlativo_v=' + encodeURIComponent(correlativo));
     });
 </script>
