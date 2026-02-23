@@ -2,6 +2,7 @@
 include("../seguridad.php");
 include("../conexion/clsConexion.php");
 $obj = new clsConexion;
+$es_admin = (isset($_SESSION['tipo']) && $_SESSION['tipo'] === 'ADMINISTRADOR');
 $result = $obj->consultar("SELECT sintoma.sintoma
 		     , productos.*
 		     , lote.numero
@@ -34,16 +35,18 @@ foreach ((array) $result as $row) {
 	} else {
 		$estado = "<span class='label label-danger'>Inactivo</span>";
 	}
+	$p_compra = $es_admin ? number_format((float)$row['precio_compra'], 2, '.', '') : '—';
 	$data[] = array(
 		"0" => $row['descripcion'],
 		"1" => $row['presentacion'],
 		"2" => $row['precio_venta'],
-		"3" => $row['sintoma'],
-		"4" => $receta,
-		"5" => $estado,
-		"6" => $color,
-		"7" => $row['tipo'],
-		"8" => '<button type="button"
+		"3" => $p_compra,
+		"4" => $row['sintoma'],
+		"5" => $receta,
+		"6" => $estado,
+		"7" => $color,
+		"8" => $row['tipo'],
+		"9" => '<button type="button"
 				data-id1="' . $row["idproducto"] . '"
 				data-id2="' . $row["descripcion"] . '"
 				data-id3="' . $row["presentacion"] . '"

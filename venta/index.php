@@ -289,6 +289,7 @@ foreach ($data as $row) {
 									<th><a href="#">Descripcion</a></th>
 									<th><a href="#">Presentacion</a></th>
 									<th data-hide="phone"><a href="#">Precio</a></th>
+									<th data-hide="phone" id="th-pcompra"><a href="#">P. Compra</a></th>
 									<th><a href="#">Sintoma</a></th>
 									<th><a href="#">Con receta</a></th>
 									<th data-hide="phone"><a href="#">Estado</a></th>
@@ -324,8 +325,12 @@ foreach ($data as $row) {
 									},
 									"bDestroy": true,
 									"iDisplayLength": 5,//Paginación
-									"order": [[0, "desc"]]//Ordenar (columna,orden)
+									"order": [[0, "desc"]],//Ordenar (columna,orden)
+									"columnDefs": [ { "targets": 3, "className": "text-right" } ]
 								}).DataTable();
+							// Ocultar columna P. Compra (índice 3) para no administradores
+							var esAdmin = <?php echo (isset($_SESSION['tipo']) && $_SESSION['tipo'] === 'ADMINISTRADOR') ? 'true' : 'false'; ?>;
+							if (!esAdmin) tabla.column(3).visible(false);
 						});
 					</script>
 				</div>
@@ -510,7 +515,7 @@ foreach ($data as $row) {
 						limpiar();
 						// Disminuir stock visual en la tabla del modal
 						var $row = $btn.closest('tr');
-						var $stockCell = $row.find('td:eq(6)');
+						var $stockCell = $row.find('td:eq(7)');
 						var $span = $stockCell.find('.label');
 						if ($span.length) {
 							var n = parseInt($span.text(), 10) || 0;
@@ -549,7 +554,7 @@ foreach ($data as $row) {
 						var $modalBtn = $('#my-example').find('button.btn_add[data-id1="' + id + '"]');
 						if ($modalBtn.length) {
 							var $row = $modalBtn.closest('tr');
-							var $stockCell = $row.find('td:eq(6)');
+							var $stockCell = $row.find('td:eq(7)');
 							var $span = $stockCell.find('.label');
 							if ($span.length) {
 								var n = parseInt($span.text(), 10) || 0;
