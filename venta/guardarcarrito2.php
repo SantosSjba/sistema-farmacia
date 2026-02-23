@@ -16,6 +16,15 @@ $prese=trim($obj->real_escape_string(htmlentities(strip_tags($_POST['pres'],ENT_
 $v_u=trim($obj->real_escape_string(htmlentities(strip_tags($_POST['pre'],ENT_QUOTES))));
 //$dsc=trim($obj->real_escape_string(htmlentities(strip_tags($_POST['dsc'],ENT_QUOTES))));
 
+// Verificar stock: no permitir agregar si stock <= 0
+$chk=$obj->consultar("SELECT stock FROM productos WHERE idproducto='$idproducto' LIMIT 1");
+$stock_actual = 0;
+if (is_array($chk) && count($chk) > 0) $stock_actual = (float)$chk[0]['stock'];
+if ($stock_actual <= 0) {
+  echo 'No hay stock disponible (stock 0). No se puede agregar.';
+  exit;
+}
+
 $impsd=$obj->consultar("SELECT
   tipo_afectacion.descripcion AS operacion,
   productos.idproducto

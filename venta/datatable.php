@@ -14,7 +14,7 @@ $result = $obj->consultar("SELECT sintoma.sintoma
 		INNER JOIN lote
 		ON productos.idlote = lote.idlote
 		INNER JOIN presentacion
-		ON productos.idpresentacion = presentacion.idpresentacion  WHERE  stock>='1' AND  estado='1'");
+		ON productos.idpresentacion = presentacion.idpresentacion  WHERE estado='1'");
 $data = array();
 foreach ((array) $result as $row) {
 	$st = $row['stock'];

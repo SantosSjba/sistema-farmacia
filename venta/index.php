@@ -497,6 +497,14 @@ foreach ($data as $row) {
 			$(document).on('click', '.btn_add', function () {
 				var $btn = $(this);
 				if ($btn.hasClass('loading')) return;
+				// No permitir agregar si stock es 0
+				var $row = $btn.closest('tr');
+				var $stockCell = $row.find('td:eq(7)');
+				var stock = parseInt($stockCell.find('.label').text() || $stockCell.text(), 10);
+				if (isNaN(stock) || stock <= 0) {
+					if (typeof alertify !== 'undefined') alertify.error('No hay stock disponible (stock 0). No se puede agregar.');
+					return;
+				}
 				var idproducto = $btn.data("id1");
 				var des = $btn.data("id2");
 				var pres = $btn.data("id3");

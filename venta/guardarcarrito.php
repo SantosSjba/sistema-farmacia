@@ -26,16 +26,25 @@ FROM productos
     ON productos.idtipoaf = tipo_afectacion.idtipoa
   INNER JOIN presentacion
     ON productos.idpresentacion = presentacion.idpresentacion
-WHERE productos.codigo='$cod' AND productos.stock>'0.01' AND productos.estado='1'");
+WHERE productos.codigo='$cod' AND productos.estado='1'");
+         		$idproducto=null; $des=null; $v_u=null; $ope=null; $prese=null;
          		foreach((array)$pro as $row){
          		  	$idproducto=$row['idproducto'];
               	$des=$row['descripcion'];
               	$v_u=$row['precio_venta'];
-                //el valor unitario es igual al precio de venta del producto
                 $ope=$row['operacion'];
                 $prese=$row['presentacion'];
-              //  $dsc=$row['descuento'];
+                $stock_producto = isset($row['stock']) ? (float)$row['stock'] : 0;
          		}
+
+if ($idproducto === null) {
+  echo 'Producto no encontrado.';
+  exit;
+}
+if (isset($stock_producto) && $stock_producto <= 0) {
+  echo 'No hay stock disponible (stock 0). No se puede agregar.';
+  exit;
+}
 
 $cant=1;
 //registra los datos del carrito
