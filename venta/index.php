@@ -274,6 +274,10 @@ foreach ($data as $row) {
 		</form>
 	</div>
 	<!-- Modal busquedaproductos-->
+	<style>
+		#modal-1 .modal-dialog { width: 96%; max-width: 1200px; margin: 20px auto; }
+		#modal-1 .modal-body { overflow-x: auto; }
+	</style>
 	<div class="modal fade" id="modal-1">
 		<div class="modal-dialog modal-lg">
 			<div class="modal-content">
